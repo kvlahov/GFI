@@ -1,0 +1,24 @@
+﻿<Window x:Class="GFIManager.View.ChooseRootFolderView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GFIManager.View"
+        mc:Ignorable="d"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="Odaberi folder s firmama" Height="450" Width="372.531" WindowStartupLocation="CenterScreen">
+    <ui:SimpleStackPanel Margin="15" Spacing="15" VerticalAlignment="Center" >
+        <ui:SimpleStackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+            <Button x:Name="BtnChooseFolder" Content="Odaberi folder" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Click="BtnChooseFolder_Click"/>
+            <fa:ImageAwesome Icon="InfoCircle" Height="20" ToolTip="Odaberi folder u kojem se nalaze folderi firmi" Foreground="{StaticResource Dark}">
+            </fa:ImageAwesome>
+        </ui:SimpleStackPanel>
+        <ui:SimpleStackPanel Spacing="5">
+            <Label>Odabrani folder:</Label>
+            <TextBlock Text="test"/>
+        </ui:SimpleStackPanel>
+        <Button x:Name="BtnSaveChanges" Content="Spremi odabir" HorizontalAlignment="Left" Click="BtnSaveChanges_Click"/>
+    </ui:SimpleStackPanel>
+</Window>

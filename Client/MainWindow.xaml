@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="GFI Manager" Height="450" Width="800" Background="{DynamicResource Grey}" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Grid>
         
     </Grid>

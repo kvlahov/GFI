@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GFIManager.Properties;
+using GFIManager.View;
 
 namespace Client
 {
@@ -23,6 +25,16 @@ namespace Client
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var rootDir = Settings.Default.RootDir;
+            if (string.IsNullOrEmpty(rootDir))
+            {
+                var chooseFileDialog = new ChooseRootFolderView();
+                chooseFileDialog.ShowDialog();
+            }
         }
     }
 }
