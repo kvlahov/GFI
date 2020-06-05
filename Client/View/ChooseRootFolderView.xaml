@@ -8,17 +8,34 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="Odaberi folder s firmama" Height="450" Width="372.531" WindowStartupLocation="CenterScreen">
+        Title="Odaberi folder s firmama" Height="347" Width="372.531" WindowStartupLocation="CenterScreen">
     <ui:SimpleStackPanel Margin="15" Spacing="15" VerticalAlignment="Center" >
         <ui:SimpleStackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
             <Button x:Name="BtnChooseFolder" Content="Odaberi folder" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Click="BtnChooseFolder_Click"/>
-            <fa:ImageAwesome Icon="InfoCircle" Height="20" ToolTip="Odaberi folder u kojem se nalaze folderi firmi" Foreground="{StaticResource Dark}">
+            <fa:ImageAwesome Icon="InfoCircle" Height="20" ToolTip="Odaberi folder u kojem se nalaze folderi firmi">
+                <fa:ImageAwesome.Foreground>
+                    <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+                </fa:ImageAwesome.Foreground>
             </fa:ImageAwesome>
         </ui:SimpleStackPanel>
         <ui:SimpleStackPanel Spacing="5">
-            <Label>Odabrani folder:</Label>
-            <TextBlock Text="test"/>
+            <Label FontWeight="Bold">Odabrani folder:</Label>
+            <TextBlock x:Name="TbChosenFolder"/>
         </ui:SimpleStackPanel>
-        <Button x:Name="BtnSaveChanges" Content="Spremi odabir" HorizontalAlignment="Left" Click="BtnSaveChanges_Click"/>
+        <Button x:Name="BtnSaveChanges" Content="Spremi odabir" HorizontalAlignment="Left" Click="BtnSaveChanges_Click">
+            <Button.Background>
+                <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+            </Button.Background>
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+                    <Setter Property="OverridesDefaultStyle" Value="False"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=TbChosenFolder}" Value="">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </ui:SimpleStackPanel>
 </Window>

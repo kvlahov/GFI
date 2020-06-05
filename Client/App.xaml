@@ -8,15 +8,16 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemeResources/>
+                <ui:ThemeResources AccentColor="#4F5D75"/>
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
 
-            <SolidColorBrush x:Key="Dark" Color="#2D3142"/>
-            <SolidColorBrush x:Key="DarkBlue" Color="#4F5D75"/>
-            <SolidColorBrush x:Key="Grey" Color="#BFC0C0"/>
-            <SolidColorBrush x:Key="White" Color="White"/>
-            <SolidColorBrush x:Key="Orange" Color="#EF8354"/>
+            <Color x:Key="Dark">#2D3142</Color>
+            <Color x:Key="DarkBlue">#4F5D75</Color>
+            <Color x:Key="Grey">#BFC0C0</Color>
+            <Color x:Key="LightGrey">#EAEBEB</Color>
+            <Color x:Key="White">White</Color>
+            <Color x:Key="Orange">#EF8354</Color>
             <FontFamily x:Key="MainFont">Lucida Sans</FontFamily>
 
         </ResourceDictionary>

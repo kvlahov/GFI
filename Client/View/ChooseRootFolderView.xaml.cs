@@ -21,7 +21,16 @@ namespace GFIManager.View
     /// </summary>
     public partial class ChooseRootFolderView : Window
     {
-        public string ChosenFolder { get; set; }
+        private string _chosenFolder;
+        public string ChosenFolder
+        {
+            get => _chosenFolder; 
+            set
+            {
+                _chosenFolder = value;
+                TbChosenFolder.Text = value;
+            }
+        }
         public ChooseRootFolderView()
         {
             InitializeComponent();
@@ -29,22 +38,25 @@ namespace GFIManager.View
 
         private void BtnSaveChanges_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(ChosenFolder))
+            if (!string.IsNullOrEmpty(ChosenFolder))
             {
                 Settings.Default.RootDir = ChosenFolder;
                 Settings.Default.Save();
             }
+
+            Close();
         }
 
         private void BtnChooseFolder_Click(object sender, RoutedEventArgs e)
         {
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-            //dialog.InitialDirectory = "C:\\Users";
-            dialog.IsFolderPicker = true;
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true
+            };
+
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 ChosenFolder = dialog.FileName;
-                MessageBox.Show("You selected: " + dialog.FileName);
             }
         }
     }
