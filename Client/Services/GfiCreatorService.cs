@@ -6,12 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop;
 using GFIManager.Models;
-using IronXL;
 using Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using DocumentFormat.OpenXml.Bibliography;
-using IronXL.Xml.Wordprocessing;
 
 namespace GFIManager.Services
 {
@@ -96,52 +93,77 @@ namespace GFIManager.Services
 
             var newFileName = Path.GetFileNameWithoutExtension(startFile) + "-final" + ".xls";
 
+            Application xlApp = new Application();
+            Workbook xlWorkbook = xlApp.Workbooks.Open(startFile);
+            xlApp.DisplayAlerts = false;
+            xlApp.ScreenUpdating = false;
+            xlApp.Calculation = XlCalculation.xlCalculationManual;
 
-            //todo catch exception if file is used by another process
-            WorkBook workbook = WorkBook.Load(startFile);
-            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);            
+            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);
 
-            workbook.SaveAs(newFilePath);
-            workbook.Close();
-            
-            workbook = WorkBook.Load(newFilePath);
+            //create copy and load it
+            xlWorkbook.SaveCopyAs(newFilePath);
+            xlWorkbook.Close(false);
+            xlWorkbook = xlApp.Workbooks.Open(newFilePath);
 
-            WorkSheet sheet = workbook.WorkSheets.First(s => s.Name == WorkbookType.Bilanca.ToString());
-            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Bilanca);
+            //process each sheet
+            _Worksheet xlWorksheet = xlWorkbook.Sheets[WorkbookType.Bilanca.ToString()];
+            ProcessSingleSheet(company.DirectoryPath, xlWorksheet, xlApp, WorkbookType.Bilanca);
 
-            sheet = workbook.WorkSheets.First(s => s.Name == WorkbookType.RDG.ToString());
-            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.RDG);
+            xlWorksheet = xlWorkbook.Sheets[WorkbookType.RDG.ToString()];
+            ProcessSingleSheet(company.DirectoryPath, xlWorksheet, xlApp, WorkbookType.RDG);
 
-            sheet = workbook.WorkSheets.First(s => s.Name == WorkbookType.Dodatni.ToString());
-            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Dodatni);
+            xlWorksheet = xlWorkbook.Sheets[WorkbookType.Dodatni.ToString()];
+            ProcessSingleSheet(company.DirectoryPath, xlWorksheet, xlApp, WorkbookType.Dodatni);
 
-            workbook.Save();
-            workbook.Close();
+            xlApp.Calculation = XlCalculation.xlCalculationAutomatic;
+            xlApp.Calculate();
 
-            RefreshCalculatedCells(newFilePath);
+            xlWorkbook.Close(true);
+            xlApp.Quit();
+
+            ReleaseObject(xlWorkbook);
+            ReleaseObject(xlApp);
         }
-        
-        private void ProcessSingleSheet(string directoryPath, WorkSheet targetSheet, WorkbookType workbookType)
+
+        private void ProcessSingleSheet(string directoryPath, _Worksheet targetSheet, Application xlApp, WorkbookType workbookType)
         {
             var filePath = Path.Combine(directoryPath, workbooksInfo[workbookType].FileName);
-            var workbook = WorkBook.Load(filePath);
+            var workbook = xlApp.Workbooks.Open(filePath);
 
-            var sourceSheet = workbook.WorkSheets.First();
+            _Worksheet sourceSheet = workbook.Sheets[1];
             var range = workbooksInfo[workbookType].Range;
 
-            targetSheet[range].Rows
-                .Where(r => !workbooksInfo[workbookType].LockedAops.Contains(r.Columns.First().Value.ToString()))
-                .Where(r => !r.Columns.First().IsEmpty)
-                .Select(r => new { Aop = r.Columns.First(), CurrentYear = r.Columns.Last() })
+            var columnsCount = targetSheet.Range[range].Rows[1].Columns.Count;
+            targetSheet.Range[range].Rows.Cast<Range>()
+                .Where(r => !r.Cells[columnsCount].Locked)
+                .Select(r => new
+                {
+                    Aop = Convert.ToInt32(r.Cells[1].Value).ToString("D3"),
+                    CurrentYear = r.Cells[columnsCount]
+                })
                 .ToList()
                 .ForEach(r =>
                 {
                     var sourceRange = sourceWorksheetsRanges[workbookType];
-                    var value = sourceSheet[sourceRange].Rows.First(row => row.Columns.First().StringValue.TrimEnd() == r.Aop.IntValue.ToString("D3")).Columns.Last().DoubleValue;
-                    r.CurrentYear.DoubleValue = value;
+                    var value = sourceSheet.Range[sourceRange].Rows.Cast<Range>().First(row => Convert.ToString(row.Columns[1].Value) == r.Aop).Columns[columnsCount].Value;
+                    r.CurrentYear.Value = value;
                 });
 
+            //.Where(r => !workbooksInfo[workbookType].LockedAops.Contains(r.Columns.First().Value.ToString()))
+            //.Where(r => !r.Columns.First().IsEmpty)
+            //.Select(r => new { Aop = r.Columns.First(), CurrentYear = r.Columns.Last() })
+            //.ToList()
+            //.ForEach(r =>
+            //{
+            //    var sourceRange = sourceWorksheetsRanges[workbookType];
+            //    var value = sourceSheet[sourceRange].Rows.First(row => row.Columns.First().StringValue.TrimEnd() == r.Aop.IntValue.ToString("D3")).Columns.Last().DoubleValue;
+            //    r.CurrentYear.DoubleValue = value;
+            //});
+
             workbook.Close();
+            ReleaseObject(sourceSheet);
+            ReleaseObject(workbook);
         }
 
         private void RefreshCalculatedCells(string newFilePath)

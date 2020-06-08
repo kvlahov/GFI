@@ -99,7 +99,18 @@ namespace Client
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
             var service = new GfiCreatorService(selectedCompanies);
 
-            service.BuildGfis();
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                service.BuildGfis();
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+            }
+            sw.Stop();
+            MessageBox.Show($"Elapsed time: {sw.ElapsedMilliseconds / 1000}s");
             
         }
 
