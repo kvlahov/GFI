@@ -96,12 +96,14 @@ namespace GFIManager.Services
 
             var newFileName = Path.GetFileNameWithoutExtension(startFile) + "-final" + ".xls";
 
+
             //todo catch exception if file is used by another process
             WorkBook workbook = WorkBook.Load(startFile);
-            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);
+            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);            
+
             workbook.SaveAs(newFilePath);
             workbook.Close();
-
+            
             workbook = WorkBook.Load(newFilePath);
 
             WorkSheet sheet = workbook.WorkSheets.First(s => s.Name == WorkbookType.Bilanca.ToString());
@@ -113,13 +115,12 @@ namespace GFIManager.Services
             sheet = workbook.WorkSheets.First(s => s.Name == WorkbookType.Dodatni.ToString());
             ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Dodatni);
 
-            //todo
-            //not yet completed, sum cells not calculating
-
             workbook.Save();
             workbook.Close();
-        }
 
+            RefreshCalculatedCells(newFilePath);
+        }
+        
         private void ProcessSingleSheet(string directoryPath, WorkSheet targetSheet, WorkbookType workbookType)
         {
             var filePath = Path.Combine(directoryPath, workbooksInfo[workbookType].FileName);
@@ -131,16 +132,68 @@ namespace GFIManager.Services
             targetSheet[range].Rows
                 .Where(r => !workbooksInfo[workbookType].LockedAops.Contains(r.Columns.First().Value.ToString()))
                 .Where(r => !r.Columns.First().IsEmpty)
-                .Select(r => new { Aop = r.Columns.First(), CurrentYear = r.Columns.Last()})
+                .Select(r => new { Aop = r.Columns.First(), CurrentYear = r.Columns.Last() })
                 .ToList()
                 .ForEach(r =>
                 {
                     var sourceRange = sourceWorksheetsRanges[workbookType];
                     var value = sourceSheet[sourceRange].Rows.First(row => row.Columns.First().StringValue.TrimEnd() == r.Aop.IntValue.ToString("D3")).Columns.Last().DoubleValue;
-                    r.CurrentYear.Value = value;
+                    r.CurrentYear.DoubleValue = value;
                 });
 
             workbook.Close();
+        }
+
+        private void RefreshCalculatedCells(string newFilePath)
+        {
+            Application xlApp = new Application();
+            Workbook xlWorkbook = xlApp.Workbooks.Open(newFilePath);
+
+            Microsoft.Office.Interop.Excel.Range cells = xlWorkbook.Sheets["Bilanca"].Range["J9:J133"].Cells;
+            RefreshSheet(cells);
+
+            cells = xlWorkbook.Sheets["RDG"].Range["J9:J105"].Cells;
+            RefreshSheet(cells);
+
+            cells = xlWorkbook.Sheets["Dodatni"].Range["J9:J88"].Cells;
+            RefreshSheet(cells);
+
+            xlApp.DisplayAlerts = false;
+            xlWorkbook.Close(true);
+            xlApp.Quit();
+
+            ReleaseObject(cells);
+            ReleaseObject(xlWorkbook);
+            ReleaseObject(xlApp);
+        }
+
+        private void RefreshSheet(Microsoft.Office.Interop.Excel.Range cells)
+        {
+            foreach (Microsoft.Office.Interop.Excel.Range cell in cells)
+            {
+                if (!cell.Locked)
+                {
+                    var value = cell.Value2;
+                    cell.Value = value;
+                }
+            }
+        }
+
+        private void ReleaseObject(object obj)
+        {
+            try
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch (Exception ex)
+            {
+                obj = null;
+            }
+            finally
+            {
+                GC.Collect();
+            }
         }
 
         private void ReadLockedCells(string filePath)
@@ -193,6 +246,15 @@ namespace GFIManager.Services
             Debug.WriteLine(bilancaCells);
             Debug.WriteLine(rdgCells);
             Debug.WriteLine(dodatniCells);
+
+            xlWorkbook.Close(false);
+            xlApp.Quit();
+
+            ReleaseObject(xlRange);
+            ReleaseObject(xlWorksheet);
+            ReleaseObject(xlWorkbook);
+            ReleaseObject(xlApp);
         }
+
     }
 }
