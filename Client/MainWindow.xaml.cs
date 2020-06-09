@@ -56,7 +56,7 @@ namespace Client
                 var companies = Directory.GetDirectories(rootDir)
                         .Select(dir => new Company(dir));
 
-                ViewModel.SetCompanies(companies);                
+                ViewModel.SetCompanies(companies);
             }
 
             catch (Exception ex)
@@ -94,24 +94,26 @@ namespace Client
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e) => LbDirectories.UnselectAll();
 
-        private void BtnBuildGfi_Click(object sender, RoutedEventArgs e)
+        private async void BtnBuildGfi_Click(object sender, RoutedEventArgs e)
         {
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
             var service = new GfiCreatorService(selectedCompanies);
+            
+            MessageBox.Show($"Processing...");
 
             var sw = Stopwatch.StartNew();
-
             try
             {
-                service.BuildGfis();
+                await Task.Run(() => service.BuildGfis()).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 ShowErrorMessage(ex.Message);
             }
+
             sw.Stop();
             MessageBox.Show($"Elapsed time: {sw.ElapsedMilliseconds / 1000}s");
-            
+
         }
 
         private void LbDirectories_SelectionChanged(object sender, SelectionChangedEventArgs e)

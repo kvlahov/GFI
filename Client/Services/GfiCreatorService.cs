@@ -146,8 +146,10 @@ namespace GFIManager.Services
                 .ForEach(r =>
                 {
                     var sourceRange = sourceWorksheetsRanges[workbookType];
-                    var value = sourceSheet.Range[sourceRange].Rows.Cast<Range>().First(row => Convert.ToString(row.Columns[1].Value) == r.Aop).Columns[columnsCount].Value;
-                    r.CurrentYear.Value = value;
+                    Range sourceColumn = sourceSheet.Range[sourceRange].Rows.Cast<Range>().First(row => Convert.ToString(row.Columns[1].Value) == r.Aop).Columns.Cast<Range>().Last();
+                    var add = sourceColumn.get_AddressLocal(false, false, XlReferenceStyle.xlA1, Type.Missing, Type.Missing);
+                    var value = sourceColumn.Value;
+                    r.CurrentYear.Value = Convert.ToInt32(value);
                 });
 
             //.Where(r => !workbooksInfo[workbookType].LockedAops.Contains(r.Columns.First().Value.ToString()))
