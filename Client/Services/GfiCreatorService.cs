@@ -146,9 +146,7 @@ namespace GFIManager.Services
                 .ForEach(r =>
                 {
                     var sourceRange = sourceWorksheetsRanges[workbookType];
-                    Range sourceColumn = sourceSheet.Range[sourceRange].Rows.Cast<Range>().First(row => Convert.ToString(row.Columns[1].Value) == r.Aop).Columns.Cast<Range>().Last();
-                    var add = sourceColumn.get_AddressLocal(false, false, XlReferenceStyle.xlA1, Type.Missing, Type.Missing);
-                    var value = sourceColumn.Value;
+                    var value = sourceSheet.Range[sourceRange].Rows.Cast<Range>().First(row => Convert.ToString(row.Columns[1].Value) == r.Aop).Columns.Cast<Range>().Last().Value;
                     r.CurrentYear.Value = Convert.ToInt32(value);
                 });
 
