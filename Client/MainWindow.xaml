@@ -65,6 +65,26 @@
                             </Style>
                         </ListBox.Resources>
 
+                        <ListBox.Style>
+                            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">     
+                                <Style.Triggers>
+                                    <!-- Use ListBox.HasItems instead of Binding -->
+                                    <Trigger Property="HasItems" Value="False">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate>
+                                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+                                                        </TextBlock.Foreground>GFI-ovi su kreirani za sve firme</TextBlock>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
+
                         <ListBox.Background>
                             <SolidColorBrush Color="{DynamicResource LightGrey}"/>
                         </ListBox.Background>
@@ -96,7 +116,7 @@
                 </Grid>
 
                 <ui:SimpleStackPanel Grid.Column="1" Spacing="5">
-                    <Button x:Name="BtnRefreshDirs" >Refresh</Button>
+                    <Button x:Name="BtnRefreshDirs" Click="BtnRefreshDirs_Click" >Refresh</Button>
                     <Button HorizontalAlignment="Stretch" MaxWidth="66" Background="{x:Null}" Click="BtnDirInfo_Click" Name="BtnDirInfo">
                         <fa:ImageAwesome Icon="InfoCircle" Width="30">
                             <fa:ImageAwesome.Foreground>

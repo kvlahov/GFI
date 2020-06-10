@@ -23,11 +23,15 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="TreeView">
+                </Style>
+            </Grid.Resources>
             <TreeView BorderThickness="0,0,0,1">
                 <TreeView.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource Dark}"/>
                 </TreeView.BorderBrush>
-                <TreeViewItem IsExpanded="True" VerticalContentAlignment="Center">
+                <TreeViewItem IsExpanded="True" x:Name="ExistingGfisContainer">
                     <TreeViewItem.Header>
                         <TextBlock Text="Firme za koje je već izrađen GFI" FontWeight="Bold">
                             <TextBlock.Foreground>
@@ -35,13 +39,11 @@
                             </TextBlock.Foreground>
                         </TextBlock>
                     </TreeViewItem.Header>
-                    <StackPanel x:Name="ExistingGfisContainer">
-                    </StackPanel>
                 </TreeViewItem>
             </TreeView>
 
             <TreeView Grid.Row="1">
-                <TreeViewItem IsExpanded="True">
+                <TreeViewItem IsExpanded="True" x:Name="MissingFilesContainer">
                     <TreeViewItem.Header>
                         <TextBlock Text="Firme kojima nedostaju neke datoteke" FontWeight="Bold">
                             <TextBlock.Foreground>
@@ -49,8 +51,6 @@
                             </TextBlock.Foreground>
                         </TextBlock>
                     </TreeViewItem.Header>
-                    <StackPanel x:Name="MissingFilesContainer">
-                    </StackPanel>
                 </TreeViewItem>
             </TreeView>
 

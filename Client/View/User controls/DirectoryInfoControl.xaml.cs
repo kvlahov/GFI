@@ -36,13 +36,13 @@ namespace GFIManager.View.User_controls
             AddTextBlocksToContainer(MissingFilesContainer, service.GetCompaniesWithMissingFiles());
         }
 
-        private void AddTextBlocksToContainer(Panel container, IEnumerable<Company> companies)
+        private void AddTextBlocksToContainer(TreeViewItem container, IEnumerable<Company> companies)
         {
-            container.Children.Clear();
+            container.Items.Clear();
             companies
-                .Select(c => new TextBlock() { Text = c.DisplayName })
+                .Select(c => new TreeViewItem() { Header = c.DisplayName })
                 .ToList()
-                .ForEach(tb => container.Children.Add(tb));
+                .ForEach(tb => container.Items.Add(tb));
         }
     }
 }

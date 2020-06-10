@@ -56,9 +56,8 @@ namespace Client
             var rootDir = Settings.Default.RootDir;
             try
             {
-                var companies = Directory.GetDirectories(rootDir)
-                        .Select(dir => new Company(dir));
-
+                var service = new DirectoryService(rootDir);
+                var companies = service.GetCompaniesWithoutNewGfi();
                 ViewModel.SetCompanies(companies);
             }
 
@@ -68,16 +67,34 @@ namespace Client
             }
         }
 
+        private DispatcherTimer PrepareTimer(Stopwatch sw)
+        {
+            var dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += (sender, e) => DispatcherTimer_Tick(sw.ElapsedMilliseconds);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            return dispatcherTimer;
+        }
+
+        private void DispatcherTimer_Tick(long elapsedMiliseconds)
+        {
+            var elapsedSeconds = TimeSpan.FromMilliseconds(elapsedMiliseconds);
+            LbElapsedTime.Text = elapsedSeconds.ToString(@"mm\:ss");
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        #region Dialogs
         private void ShowErrorMessage(string message)
         {
-            MessageBox.Show(message, "Error", MessageBoxButton.OK);
-        }
+            var dialog = new ContentDialog
+            {
+                Title = "Greška",
+                Content = message,
+                CloseButtonText = "Ok",
+                DefaultButton = ContentDialogButton.Close
+            };
 
-        private void BtnSettings_Click(object sender, RoutedEventArgs e)
-        {
-            ShowChooseFolderDialog();
+            dialog.ShowAsync();
         }
-
         private void ShowChooseFolderDialog()
         {
             var chooseFileDialog = new ChooseRootFolderView
@@ -93,6 +110,38 @@ namespace Client
             }
         }
 
+        private void ShowInfoDialog(string message, string title)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                CloseButtonText = "Ok",
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            dialog.ShowAsync();
+        }
+
+        private MessageBoxResult ShowConfirmationDialog(string message, string title)
+        {
+            return MessageBox.Show(
+                message,
+                title,
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Question,
+                MessageBoxResult.Cancel
+            );
+        }
+
+        #endregion
+
+        #region Events
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            ShowChooseFolderDialog();
+        }
+
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e) => LbDirectories.SelectAll();
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e) => LbDirectories.UnselectAll();
@@ -100,7 +149,8 @@ namespace Client
         private async void BtnBuildGfi_Click(object sender, RoutedEventArgs e)
         {
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
-            var service = new GfiCreatorService(selectedCompanies);
+            var validCompanies = new DirectoryService(Settings.Default.RootDir).GetCompaniesWithoutNewGfi().Intersect(selectedCompanies);
+            var service = new GfiCreatorService(validCompanies);
 
             Loader.Visibility = Visibility.Visible;
 
@@ -119,39 +169,16 @@ namespace Client
             sw.Stop();
             dispatcherTimer.Stop();
 
-            Dispatcher.Invoke(() => Loader.Visibility = Visibility.Hidden);
-
-            MessageBox.Show($"Elapsed time: {sw.ElapsedMilliseconds / 1000}s", "Elapsed time");
-
-        }
-
-        private DispatcherTimer PrepareTimer(Stopwatch sw)
-        {
-            var dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += (sender, e) => DispatcherTimer_Tick(sw.ElapsedMilliseconds);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            return dispatcherTimer;
-        }
-
-        private void DispatcherTimer_Tick(long elapsedMiliseconds)
-        {
-            var elapsedSeconds = TimeSpan.FromMilliseconds(elapsedMiliseconds);
-            LbElapsedTime.Text = elapsedSeconds.ToString(@"mm\:ss");
-            CommandManager.InvalidateRequerySuggested();
-        }
-
-        private void LbDirectories_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ViewModel.AreItemsSelected = LbDirectories.SelectedItems.Count > 0;
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var option = MessageBox.Show("Jeste li sigurni da želite izaći iz aplikacije?", "Izlazak", MessageBoxButton.OKCancel);
-            if(option == MessageBoxResult.Cancel)
+            Dispatcher.Invoke(() =>
             {
-                e.Cancel = true;
-            }
+                Loader.Visibility = Visibility.Hidden;
+                var sb = new StringBuilder();
+                sb.Append("Obrada završena");
+                sb.Append(Environment.NewLine);
+                sb.Append($"Proteklo vremena: {TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds):mm\\:ss}");
+                ShowInfoDialog(sb.ToString(), "Završeno");
+                LoadCompanies();
+            });
         }
 
         private async void BtnDirInfo_Click(object sender, RoutedEventArgs e)
@@ -165,5 +192,23 @@ namespace Client
             };
             _ = await dialog.ShowAsync();
         }
+
+        private void BtnRefreshDirs_Click(object sender, RoutedEventArgs e) => LoadCompanies();
+
+        private void LbDirectories_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ViewModel.AreItemsSelected = LbDirectories.SelectedItems.Count > 0;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var option = ShowConfirmationDialog("Jeste li sigurni da želite izaći iz aplikacije?", "Izlazak");
+            if (option == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
+            }
+        }
+        #endregion
+
     }
 }
