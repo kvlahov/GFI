@@ -83,7 +83,7 @@ namespace GFIManager.Services
 
         public void BuildGfis()
         {
-            companies.ToList().ForEach(ProcessSingleCompany);
+            Parallel.ForEach(companies, ProcessSingleCompany);
         }
 
         private void ProcessSingleCompany(Company company)
@@ -150,57 +150,10 @@ namespace GFIManager.Services
                     r.CurrentYear.Value = Convert.ToInt32(value);
                 });
 
-            //.Where(r => !workbooksInfo[workbookType].LockedAops.Contains(r.Columns.First().Value.ToString()))
-            //.Where(r => !r.Columns.First().IsEmpty)
-            //.Select(r => new { Aop = r.Columns.First(), CurrentYear = r.Columns.Last() })
-            //.ToList()
-            //.ForEach(r =>
-            //{
-            //    var sourceRange = sourceWorksheetsRanges[workbookType];
-            //    var value = sourceSheet[sourceRange].Rows.First(row => row.Columns.First().StringValue.TrimEnd() == r.Aop.IntValue.ToString("D3")).Columns.Last().DoubleValue;
-            //    r.CurrentYear.DoubleValue = value;
-            //});
-
             workbook.Close();
             ReleaseObject(sourceSheet);
             ReleaseObject(workbook);
         }
-
-        private void RefreshCalculatedCells(string newFilePath)
-        {
-            Application xlApp = new Application();
-            Workbook xlWorkbook = xlApp.Workbooks.Open(newFilePath);
-
-            Microsoft.Office.Interop.Excel.Range cells = xlWorkbook.Sheets["Bilanca"].Range["J9:J133"].Cells;
-            RefreshSheet(cells);
-
-            cells = xlWorkbook.Sheets["RDG"].Range["J9:J105"].Cells;
-            RefreshSheet(cells);
-
-            cells = xlWorkbook.Sheets["Dodatni"].Range["J9:J88"].Cells;
-            RefreshSheet(cells);
-
-            xlApp.DisplayAlerts = false;
-            xlWorkbook.Close(true);
-            xlApp.Quit();
-
-            ReleaseObject(cells);
-            ReleaseObject(xlWorkbook);
-            ReleaseObject(xlApp);
-        }
-
-        private void RefreshSheet(Microsoft.Office.Interop.Excel.Range cells)
-        {
-            foreach (Microsoft.Office.Interop.Excel.Range cell in cells)
-            {
-                if (!cell.Locked)
-                {
-                    var value = cell.Value2;
-                    cell.Value = value;
-                }
-            }
-        }
-
         private void ReleaseObject(object obj)
         {
             try

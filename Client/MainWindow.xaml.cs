@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using GFIManager.Models;
 using GFIManager.Properties;
 using GFIManager.Services;
@@ -98,10 +99,12 @@ namespace Client
         {
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
             var service = new GfiCreatorService(selectedCompanies);
-            
-            MessageBox.Show($"Processing...");
+
+            Loader.Visibility = Visibility.Visible;
 
             var sw = Stopwatch.StartNew();
+            var dispatcherTimer = PrepareTimer(sw);
+            dispatcherTimer.Start();
             try
             {
                 await Task.Run(() => service.BuildGfis()).ConfigureAwait(false);
@@ -112,13 +115,41 @@ namespace Client
             }
 
             sw.Stop();
-            MessageBox.Show($"Elapsed time: {sw.ElapsedMilliseconds / 1000}s");
+            dispatcherTimer.Stop();
 
+            Dispatcher.Invoke(() => Loader.Visibility = Visibility.Hidden);
+
+            MessageBox.Show($"Elapsed time: {sw.ElapsedMilliseconds / 1000}s", "Elapsed time");
+
+        }
+
+        private DispatcherTimer PrepareTimer(Stopwatch sw)
+        {
+            var dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += (sender, e) => DispatcherTimer_Tick(sw.ElapsedMilliseconds);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            return dispatcherTimer;
+        }
+
+        private void DispatcherTimer_Tick(long elapsedMiliseconds)
+        {
+            var elapsedSeconds = TimeSpan.FromMilliseconds(elapsedMiliseconds);
+            LbElapsedTime.Text = elapsedSeconds.ToString(@"mm\:ss");
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void LbDirectories_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ViewModel.AreItemsSelected = LbDirectories.SelectedItems.Count > 0;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var option = MessageBox.Show("Jeste li sigurni da želite izaći iz aplikacije?", "Izlazak", MessageBoxButton.OKCancel);
+            if(option == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
