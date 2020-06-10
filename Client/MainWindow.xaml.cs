@@ -20,7 +20,9 @@ using GFIManager.Models;
 using GFIManager.Properties;
 using GFIManager.Services;
 using GFIManager.View;
+using GFIManager.View.User_controls;
 using GFIManager.ViewModels;
+using ModernWpf.Controls;
 
 namespace Client
 {
@@ -150,6 +152,18 @@ namespace Client
             {
                 e.Cancel = true;
             }
+        }
+
+        private async void BtnDirInfo_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ContentDialog()
+            {
+                IsShadowEnabled = true,
+                Content = new DirectoryInfoControl(),
+                Title = "Informacije o firmama",
+                CloseButtonText = "Zatvori"
+            };
+            _ = await dialog.ShowAsync();
         }
     }
 }

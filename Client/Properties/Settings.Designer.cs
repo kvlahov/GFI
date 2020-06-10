@@ -34,5 +34,50 @@ namespace GFIManager.Properties {
                 this["RootDir"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("bil.xls")]
+        public string BilancaFileName {
+            get {
+                return ((string)(this["BilancaFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("rdg.xls")]
+        public string RDGFileName {
+            get {
+                return ((string)(this["RDGFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("dod.xls")]
+        public string DodatniFileName {
+            get {
+                return ((string)(this["DodatniFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-final")]
+        public string FinalGfiSuffix {
+            get {
+                return ((string)(this["FinalGfiSuffix"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("objava 2019.xls")]
+        public string OldGfiSuffix {
+            get {
+                return ((string)(this["OldGfiSuffix"]));
+            }
+        }
     }
 }

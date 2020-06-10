@@ -9,6 +9,7 @@ using GFIManager.Models;
 using Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using GFIManager.Properties;
 
 namespace GFIManager.Services
 {
@@ -43,7 +44,7 @@ namespace GFIManager.Services
                     WorkbookType.Bilanca,
                     new WorksheetInfo
                     {
-                        FileName = "bil.xls",
+                        FileName = Settings.Default.BilancaFileName,
                         Range = "G9:J133",
                         LockedAops = new List<string>
                         {
@@ -56,7 +57,7 @@ namespace GFIManager.Services
                     WorkbookType.RDG,
                     new WorksheetInfo
                     {
-                        FileName = "rdg.xls",
+                        FileName = Settings.Default.RDGFileName,
                         Range = "G8:J68",
                         LockedAops = new List<string>
                         {
@@ -70,7 +71,7 @@ namespace GFIManager.Services
                     WorkbookType.Dodatni,
                     new WorksheetInfo
                     {
-                        FileName = "dod.xls",
+                        FileName = Settings.Default.DodatniFileName,
                         Range = "H9:J88",
                         LockedAops = new List<string>
                         {
@@ -89,9 +90,9 @@ namespace GFIManager.Services
         private void ProcessSingleCompany(Company company)
         {
             var filePaths = Directory.GetFiles(company.DirectoryPath);
-            var startFile = filePaths.First(p => p.EndsWith("objava 2019.xls"));
+            var startFile = filePaths.First(p => p.EndsWith(Settings.Default.OldGfiSuffix));
 
-            var newFileName = Path.GetFileNameWithoutExtension(startFile) + "-final" + ".xls";
+            var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix + ".xls";
 
             Application xlApp = new Application();
             Workbook xlWorkbook = xlApp.Workbooks.Open(startFile);
@@ -170,66 +171,5 @@ namespace GFIManager.Services
                 GC.Collect();
             }
         }
-
-        private void ReadLockedCells(string filePath)
-        {
-            Application xlApp = new Application();
-            Workbook xlWorkbook = xlApp.Workbooks.Open(filePath);
-            _Worksheet xlWorksheet = xlWorkbook.Sheets["Bilanca"];
-            Microsoft.Office.Interop.Excel.Range xlRange = xlWorksheet.Range["J9", "J133"];
-
-            var lockedCellsBil = new List<string>();
-            foreach (Microsoft.Office.Interop.Excel.Range cell in xlRange.Cells)
-            {
-                if (cell.Locked)
-                {
-                    var val = Convert.ToString(xlWorksheet.Cells[cell.Row, 7].Value);
-                    lockedCellsBil.Add(val);
-                }
-            }
-
-            xlWorksheet = xlWorkbook.Sheets["RDG"];
-            xlRange = xlWorksheet.Range["J8", "J105"];
-
-            var lockedCellsRDG = new List<string>();
-            foreach (Microsoft.Office.Interop.Excel.Range cell in xlRange.Cells)
-            {
-                if (cell.Locked)
-                {
-                    var val = Convert.ToString(xlWorksheet.Cells[cell.Row, 7].Value);
-                    lockedCellsRDG.Add(val);
-                }
-            }
-
-            xlWorksheet = xlWorkbook.Sheets["Dodatni"];
-            xlRange = xlWorksheet.Range["J9", "J88"];
-
-            var lockedCellsDod = new List<string>();
-            foreach (Microsoft.Office.Interop.Excel.Range cell in xlRange.Cells)
-            {
-                if (cell.Locked)
-                {
-                    var val = Convert.ToString(xlWorksheet.Cells[cell.Row, 8].Value);
-                    lockedCellsDod.Add(val);
-                }
-            }
-
-            var bilancaCells = string.Join(", ", lockedCellsBil.Where(s => !string.IsNullOrEmpty(s)).Select(s => $"\"{s}\""));
-            var rdgCells = string.Join(", ", lockedCellsRDG.Where(s => !string.IsNullOrEmpty(s)).Select(s => $"\"{s}\""));
-            var dodatniCells = string.Join(", ", lockedCellsDod.Where(s => !string.IsNullOrEmpty(s)).Select(s => $"\"{s}\""));
-
-            Debug.WriteLine(bilancaCells);
-            Debug.WriteLine(rdgCells);
-            Debug.WriteLine(dodatniCells);
-
-            xlWorkbook.Close(false);
-            xlApp.Quit();
-
-            ReleaseObject(xlRange);
-            ReleaseObject(xlWorksheet);
-            ReleaseObject(xlWorkbook);
-            ReleaseObject(xlApp);
-        }
-
     }
 }

@@ -21,11 +21,11 @@ namespace GFIManager.Models
         }
         public string DirectoryPath { get; set; }
 
-        public Company(string path)
+        public Company(string dirPath)
         {
-            DirectoryPath = path;
+            DirectoryPath = dirPath;
 
-            DisplayName = new DirectoryInfo(path).Name;
+            DisplayName = new DirectoryInfo(dirPath).Name;
         }
 
         private string ToTitleCase(string value)
@@ -34,5 +34,10 @@ namespace GFIManager.Models
 
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value.ToLower());
         }
+
+        public override bool Equals(object obj) => 
+            obj is Company other && DisplayName.Equals(other.DisplayName);
+
+        public override int GetHashCode() => DisplayName.GetHashCode();
     }
 }
