@@ -140,7 +140,7 @@
                         </Setter>
                     </Style>
                 </ui:SimpleStackPanel.Resources>
-                <TextBlock Text="Procesuiram podatke. Molim pričekajte..." FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="Obrađujem datoteke. Molim pričekajte..." FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <ui:ProgressBar IsIndeterminate="True" >
                     <ui:ProgressBar.Foreground>
                         <SolidColorBrush Color="{DynamicResource Orange}"/>
