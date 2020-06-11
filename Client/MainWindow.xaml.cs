@@ -178,6 +178,8 @@ namespace Client
                 sb.Append($"Proteklo vremena: {TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds):mm\\:ss}");
                 ShowInfoDialog(sb.ToString(), "Završeno");
                 LoadCompanies();
+
+                NotesControl.RefreshCompaniesAsync();
             });
         }
 

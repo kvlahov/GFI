@@ -128,6 +128,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\Company.cs" />
+    <Compile Include="Models\CompanyNotes.cs" />
     <Compile Include="Models\WorkbookType.cs" />
     <Compile Include="Models\WorksheetInfo.cs" />
     <Compile Include="Services\DirectoryService.cs" />

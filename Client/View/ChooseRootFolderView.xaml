@@ -8,21 +8,41 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="Odaberi folder s firmama" Height="347" Width="372.531" WindowStartupLocation="CenterScreen">
-    <ui:SimpleStackPanel Margin="15" Spacing="15" VerticalAlignment="Center" >
-        <ui:SimpleStackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-            <Button x:Name="BtnChooseFolder" Content="Odaberi folder" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Center" Click="BtnChooseFolder_Click"/>
-            <fa:ImageAwesome Icon="InfoCircle" Height="20" ToolTip="Odaberi folder u kojem se nalaze folderi firmi">
+        Title="Odaberi folder s firmama" Height="347" Width="372.531" WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" WindowStyle="ToolWindow">
+    <Window.Background>
+        <SolidColorBrush Color="{DynamicResource White}"/>
+    </Window.Background>
+    <Grid Margin="15" MaxWidth="600">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Margin="0 0 0 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="BtnChooseFolder" Content="Odaberi folder" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" Click="BtnChooseFolder_Click" VerticalAlignment="Center" Margin="0,10,10,10" Padding="8,12"/>
+            <fa:ImageAwesome Grid.Column="1" Icon="InfoCircle" Height="20" ToolTip="Odaberi folder u kojem se nalaze folderi firmi">
                 <fa:ImageAwesome.Foreground>
                     <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
                 </fa:ImageAwesome.Foreground>
             </fa:ImageAwesome>
+        </Grid>
+        <ui:SimpleStackPanel Spacing="5" Grid.Row="1" Margin="0 0 0 10">
+            <Label FontWeight="Bold">
+                <Label.Foreground>
+                    <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+                </Label.Foreground> Odabrani folder:</Label>
+            <TextBlock x:Name="TbChosenFolder">
+                <TextBlock.Foreground>
+                    <SolidColorBrush Color="{DynamicResource Dark}"/>
+                </TextBlock.Foreground>
+            </TextBlock>
         </ui:SimpleStackPanel>
-        <ui:SimpleStackPanel Spacing="5">
-            <Label FontWeight="Bold">Odabrani folder:</Label>
-            <TextBlock x:Name="TbChosenFolder"/>
-        </ui:SimpleStackPanel>
-        <Button x:Name="BtnSaveChanges" Content="Spremi odabir" HorizontalAlignment="Left" Click="BtnSaveChanges_Click">
+        
+        <Button x:Name="BtnSaveChanges" Grid.Row="2" Content="Spremi odabir" HorizontalAlignment="Stretch" Click="BtnSaveChanges_Click" Margin="0,12">
             <Button.Background>
                 <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
             </Button.Background>
@@ -37,5 +57,5 @@
                 </Style>
             </Button.Style>
         </Button>
-    </ui:SimpleStackPanel>
+    </Grid>
 </Window>

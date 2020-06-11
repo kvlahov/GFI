@@ -18,7 +18,7 @@ namespace GFIManager.Services
         {
             root = rootDir;
             companies = Directory.GetDirectories(rootDir).Select(d => new Company(d));
-            notesService = new NotesBuildingService();
+            notesService = new NotesBuildingService(rootDir);
         }
 
         public IEnumerable<Company> GetCompaniesWithMissingFiles()
@@ -72,7 +72,7 @@ namespace GFIManager.Services
 
         public Task<IEnumerable<Company>> GetCompaniesWithCreatedNotes()
         {
-            return notesService.GetCompaniesWithCreatedNotes(root, companies);
+            return notesService.GetCompaniesWithCreatedNotes(companies);
         }
 
         public async Task<IEnumerable<Company>> GetCompaniesWithoutNotes()

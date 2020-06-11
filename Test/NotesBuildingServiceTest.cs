@@ -17,7 +17,7 @@ namespace Test
 
             var companies = dirService.GetCompaniesWithCreatedGfi();
 
-            var sut = new NotesBuildingService();
+            var sut = new NotesBuildingService(root);
 
             var res = sut.CompanyHasInvalidGfi(companies.First());
 
@@ -31,9 +31,9 @@ namespace Test
             var dirService = new DirectoryService(root);
 
             var companies = dirService.GetCompaniesWithCreatedGfi();
-            var sut = new NotesBuildingService();
+            var sut = new NotesBuildingService(root);
             
-            var res = sut.GetCompaniesWithCreatedNotes(root, companies);
+            var res = sut.GetCompaniesWithCreatedNotes(companies);
             
             //Assert.AreNotEqual(res.Count(), 0);
 
