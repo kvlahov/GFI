@@ -11,7 +11,7 @@ namespace Test
     [TestClass]
     public class GfiCreatorServiceTest
     {
-        private GfiCreatorService service;
+        private GfiBuilderService service;
         private IEnumerable<Company> allCompanies;
 
         [TestInitialize]
@@ -25,7 +25,7 @@ namespace Test
         [TestMethod]
         public void BuildGfiTest()
         {
-            service = new GfiCreatorService(new List<Company> { allCompanies.First() });
+            service = new GfiBuilderService(new List<Company> { allCompanies.First() });
 
             service.BuildGfis();
         }

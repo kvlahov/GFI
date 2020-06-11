@@ -64,7 +64,7 @@ namespace GFIManager.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-final")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-final.xls")]
         public string FinalGfiSuffix {
             get {
                 return ((string)(this["FinalGfiSuffix"]));
@@ -77,6 +77,15 @@ namespace GFIManager.Properties {
         public string OldGfiSuffix {
             get {
                 return ((string)(this["OldGfiSuffix"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("biljeske.xls")]
+        public string BiljeskeFileName {
+            get {
+                return ((string)(this["BiljeskeFileName"]));
             }
         }
     }

@@ -150,7 +150,7 @@ namespace Client
         {
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
             var validCompanies = new DirectoryService(Settings.Default.RootDir).GetCompaniesWithoutNewGfi().Intersect(selectedCompanies);
-            var service = new GfiCreatorService(validCompanies);
+            var service = new GfiBuilderService(validCompanies);
 
             Loader.Visibility = Visibility.Visible;
 

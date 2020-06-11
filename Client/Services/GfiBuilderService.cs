@@ -13,13 +13,13 @@ using GFIManager.Properties;
 
 namespace GFIManager.Services
 {
-    public class GfiCreatorService
+    public class GfiBuilderService : ExcelBaseService
     {
         private readonly IEnumerable<Company> companies;
         private readonly IDictionary<WorkbookType, WorksheetInfo> workbooksInfo;
         private readonly IDictionary<WorkbookType, string> sourceWorksheetsRanges;
 
-        public GfiCreatorService(IEnumerable<Company> companies)
+        public GfiBuilderService(IEnumerable<Company> companies)
         {
             this.companies = companies;
             workbooksInfo = GetWorkbookInfo();
@@ -92,7 +92,7 @@ namespace GFIManager.Services
             var filePaths = Directory.GetFiles(company.DirectoryPath);
             var startFile = filePaths.First(p => p.EndsWith(Settings.Default.OldGfiSuffix));
 
-            var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix + ".xls";
+            var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix;
 
             Application xlApp = new Application();
             Workbook xlWorkbook = xlApp.Workbooks.Open(startFile);
@@ -155,21 +155,6 @@ namespace GFIManager.Services
             ReleaseObject(sourceSheet);
             ReleaseObject(workbook);
         }
-        private void ReleaseObject(object obj)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-            }
-            finally
-            {
-                GC.Collect();
-            }
-        }
+        
     }
 }

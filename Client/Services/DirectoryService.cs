@@ -11,10 +11,14 @@ namespace GFIManager.Services
 {
     public class DirectoryService
     {
+        private readonly string root;
         private readonly IEnumerable<Company> companies;
+        private readonly NotesBuildingService notesService;
         public DirectoryService(string rootDir)
         {
+            root = rootDir;
             companies = Directory.GetDirectories(rootDir).Select(d => new Company(d));
+            notesService = new NotesBuildingService();
         }
 
         public IEnumerable<Company> GetCompaniesWithMissingFiles()
@@ -46,19 +50,36 @@ namespace GFIManager.Services
             return companies
                 .Except(missingFilesCompanies)
                 .Select(c => new { Company = c, Files = GetFileNames(c.DirectoryPath) })
-                .Where(c => c.Files.Any(f => f.EndsWith($"{Settings.Default.FinalGfiSuffix}.xls")))
+                .Where(c => c.Files.Any(f => f.EndsWith(Settings.Default.FinalGfiSuffix)))
                 .Select(c => c.Company);
         }
-
-        private string[] GetFileNames(string directoryPath) =>
-            Directory.GetFiles(directoryPath).Select(Path.GetFileName).ToArray();
-
+        
         public IEnumerable<Company> GetCompaniesWithoutNewGfi()
         {
             var missingFilesCompanies = GetCompaniesWithMissingFiles();
             var companiesWithGfi = GetCompaniesWithCreatedGfi();
 
             return companies.Except(missingFilesCompanies).Except(companiesWithGfi);
+        }
+
+        private string[] GetFileNames(string directoryPath) =>
+            Directory.GetFiles(directoryPath).Select(Path.GetFileName).ToArray();
+
+        public Task<IEnumerable<Company>> GetCompaniesWithInvalidGfi()
+        {
+            return Task.Run(() => GetCompaniesWithCreatedGfi().Where(notesService.CompanyHasInvalidGfi));
+        }
+
+        public Task<IEnumerable<Company>> GetCompaniesWithCreatedNotes()
+        {
+            return notesService.GetCompaniesWithCreatedNotes(root, companies);
+        }
+
+        public async Task<IEnumerable<Company>> GetCompaniesWithoutNotes()
+        {
+            var invalidGfisTask = GetCompaniesWithInvalidGfi();
+            var createdNotesTask = GetCompaniesWithCreatedNotes();
+            return GetCompaniesWithCreatedGfi().Except(await invalidGfisTask).Except(await createdNotesTask);
         }
     }
 }

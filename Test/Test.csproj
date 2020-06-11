@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="GfiCreatorServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NotesBuildingServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

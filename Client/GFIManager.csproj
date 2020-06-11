@@ -131,7 +131,10 @@
     <Compile Include="Models\WorkbookType.cs" />
     <Compile Include="Models\WorksheetInfo.cs" />
     <Compile Include="Services\DirectoryService.cs" />
-    <Compile Include="Services\GfiCreatorService.cs" />
+    <Compile Include="Services\ExcelBaseService.cs" />
+    <Compile Include="Services\GfiBuilderService.cs" />
+    <Compile Include="Services\NotesBuildingService.cs" />
+    <Compile Include="ViewModels\PrepareNotesViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="View\ChooseRootFolderView.xaml.cs">
@@ -139,6 +142,9 @@
     </Compile>
     <Compile Include="View\User controls\DirectoryInfoControl.xaml.cs">
       <DependentUpon>DirectoryInfoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\User controls\PrepareNotesControl.xaml.cs">
+      <DependentUpon>PrepareNotesControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -157,6 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\User controls\DirectoryInfoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\User controls\PrepareNotesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
