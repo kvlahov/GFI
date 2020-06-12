@@ -170,13 +170,13 @@
                         </Setter>
                     </Style>
                 </ui:SimpleStackPanel.Resources>
-                <TextBlock Text="Obrađujem datoteke. Molim pričekajte..." FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="Obrađujem podatke. Molim pričekajte..." FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <ui:ProgressBar IsIndeterminate="True" >
                     <ui:ProgressBar.Foreground>
                         <SolidColorBrush Color="{DynamicResource Orange}"/>
                     </ui:ProgressBar.Foreground>
                 </ui:ProgressBar>
-                <ui:SimpleStackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                <ui:SimpleStackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" Name="ElapsedTimeContainer">
                     <TextBlock Text="Prošlo vremena:" FontSize="24"/>
                     <TextBlock FontSize="24" Name="LbElapsedTime"/>
                 </ui:SimpleStackPanel>

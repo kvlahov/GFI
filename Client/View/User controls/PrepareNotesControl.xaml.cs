@@ -26,6 +26,9 @@ namespace GFIManager.View.User_controls
     public partial class PrepareNotesControl : UserControl
     {
         public PrepareNotesViewModel ViewModel { get; private set; }
+
+        public event Action OnBackgroundWorkStart;
+        public event Action OnBackgroundWorkEnd;
         public PrepareNotesControl()
         {
             InitializeComponent();
@@ -52,7 +55,8 @@ namespace GFIManager.View.User_controls
 
             var generatedNotesCompanies = await createdNotesTask;
             var invalidCompanies = await invalidCompaniesTask;
-            var validCompanies = service.GetCompaniesWithCreatedGfi().Except(generatedNotesCompanies).Except(invalidCompanies);
+            //var validCompanies = service.GetCompaniesWithCreatedGfi().Except(generatedNotesCompanies).Except(invalidCompanies);
+            var validCompanies = service.GetCompaniesWithCreatedGfi();
 
             Dispatcher.Invoke(() =>
             {
@@ -73,7 +77,14 @@ namespace GFIManager.View.User_controls
 
         private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            await LoadCompaniesAsync().ConfigureAwait(false);
+            try
+            {
+                await LoadCompaniesAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() => ShowErrorMessage(ex.Message));
+            }
         }
 
         private async void BtnPrepareNotes_Click(object sender, RoutedEventArgs e)
@@ -82,18 +93,37 @@ namespace GFIManager.View.User_controls
             var notesToOverride = LbCreatedNotesCompanies.SelectedItems.Cast<Company>().ToList();
             var notesToAdd = LbValidCompanies.SelectedItems.Cast<Company>().ToList();
 
-            var msg = GetOverrideMessage(notesToOverride);
+            if (notesToOverride.Any())
+            {
+                var msg = GetOverrideMessage(notesToOverride);
 
-            var answer = ShowConfirmationDialog(msg, "Prepisivanje podataka");
+                var answer = ShowConfirmationDialog(msg, "Prepisivanje podataka");
 
-            if (answer == MessageBoxResult.Cancel) return;
+                if (answer == MessageBoxResult.Cancel) return;
+            }
 
-            //Task addNotesTask = service.AddNotesForCompanies(notesToAdd);
-            //Task updateNotesTask = service.UpdateNotesForCompanies(notesToOverride);
+            await ShowInfoDialog("Izrađujem podatke za bilješke", "Obrada");
+            OnBackgroundWorkStart?.Invoke();
 
-            //await Task.WhenAll(addNotesTask, updateNotesTask);
+            try
+            {
+                var dataToAdd = service.GetDataForNotes(notesToAdd);
+                var dataToOverride = service.GetDataForNotes(notesToOverride);
 
-            ShowInfoDialog("Podaci za bilješke spremljeni.", "Kraj operacije");
+                service.AddNotesForCompanies(dataToAdd);
+                service.UpdateNotesForCompanies(dataToOverride);
+                
+                OnBackgroundWorkEnd?.Invoke();
+
+                await ShowInfoDialog("Podaci za bilješke spremljeni.", "Kraj operacije");
+
+                await LoadCompaniesAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex.Message);
+                OnBackgroundWorkEnd?.Invoke();
+            }
         }
 
         private string GetOverrideMessage(List<Company> notesToOverride)
@@ -118,7 +148,7 @@ namespace GFIManager.View.User_controls
             );
         }
 
-        private void ShowInfoDialog(string message, string title)
+        private async Task ShowInfoDialog(string message, string title)
         {
             var dialog = new ContentDialog
             {
@@ -128,7 +158,21 @@ namespace GFIManager.View.User_controls
                 DefaultButton = ContentDialogButton.Close
             };
 
+            await dialog.ShowAsync();
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Greška",
+                Content = message,
+                CloseButtonText = "Ok",
+                DefaultButton = ContentDialogButton.Close
+            };
+
             dialog.ShowAsync();
         }
+
     }
 }

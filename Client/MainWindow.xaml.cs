@@ -48,6 +48,18 @@ namespace Client
             }
 
             LoadCompanies();
+
+            NotesControl.OnBackgroundWorkStart += () =>
+            {
+                ElapsedTimeContainer.Visibility = Visibility.Collapsed;
+                Loader.Visibility = Visibility.Visible;
+            };
+
+            NotesControl.OnBackgroundWorkEnd += () =>
+            {
+                ElapsedTimeContainer.Visibility = Visibility.Visible;
+                Loader.Visibility = Visibility.Hidden;
+            };
         }
 
         private void LoadCompanies()
@@ -169,18 +181,18 @@ namespace Client
             sw.Stop();
             dispatcherTimer.Stop();
 
-            Dispatcher.Invoke(() =>
-            {
-                Loader.Visibility = Visibility.Hidden;
-                var sb = new StringBuilder();
-                sb.Append("Obrada završena");
-                sb.Append(Environment.NewLine);
-                sb.Append($"Proteklo vremena: {TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds):mm\\:ss}");
-                ShowInfoDialog(sb.ToString(), "Završeno");
-                LoadCompanies();
+            _ = Dispatcher.Invoke(async () =>
+              {
+                  Loader.Visibility = Visibility.Hidden;
+                  var sb = new StringBuilder();
+                  sb.Append("Obrada završena");
+                  sb.Append(Environment.NewLine);
+                  sb.Append($"Proteklo vremena: {TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds):mm\\:ss}");
+                  ShowInfoDialog(sb.ToString(), "Završeno");
+                  LoadCompanies();
 
-                NotesControl.RefreshCompaniesAsync();
-            });
+                  await NotesControl.RefreshCompaniesAsync();
+              });
         }
 
         private async void BtnDirInfo_Click(object sender, RoutedEventArgs e)

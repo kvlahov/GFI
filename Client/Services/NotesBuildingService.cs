@@ -2,6 +2,7 @@
 using GFIManager.Properties;
 using Microsoft.Office.Interop.Excel;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
@@ -16,16 +17,30 @@ namespace GFIManager.Services
     public class NotesBuildingService : ExcelBaseService
     {
         private readonly string root;
+        private string notesFilePath;
+
         public NotesBuildingService(string rootDir)
         {
             root = rootDir;
             CreateFileIfNotExists();
+            notesFilePath = Directory.GetFiles(root).First(f => f.EndsWith(Settings.Default.BiljeskeFileName));
         }
 
         private void CreateFileIfNotExists()
         {
             var path = Path.Combine(root, Settings.Default.BiljeskeFileName);
-            if (!File.Exists(path)) File.Create(path).Dispose();
+            if (!File.Exists(path))
+            {
+                var workbook = new HSSFWorkbook();
+                workbook.CreateSheet();
+                //set headers
+
+                using(FileStream outputStream = new FileStream(path, FileMode.Create))
+                {
+                    workbook.Write(outputStream);
+                }
+
+            }
         }
 
         public bool CompanyHasInvalidGfi(Company company)
@@ -54,13 +69,8 @@ namespace GFIManager.Services
 
         public async Task<IEnumerable<Company>> GetCompaniesWithCreatedNotes(IEnumerable<Company> companies)
         {
-            var notesFilePath = Directory
-                .GetFiles(root)
-                .First(f => f.EndsWith(Settings.Default.BiljeskeFileName));
-
             var companiesWithNotes = await Task.Run(() =>
             {
-                var sw = Stopwatch.StartNew();
                 HSSFWorkbook workbook;
                 using (FileStream file = new FileStream(notesFilePath, FileMode.Open, FileAccess.Read))
                 {
@@ -70,11 +80,9 @@ namespace GFIManager.Services
                 var sheet = workbook.GetSheetAt(0);
 
                 var companyNamesWithNotes = Enumerable.Range(0, sheet.LastRowNum + 1)
+                    .Where(row => sheet.GetRow(row) != null)
                     .Select(row => sheet.GetRow(row).GetCell(0)?.StringCellValue)
                     .Where(s => !string.IsNullOrWhiteSpace(s));
-
-                sw.Stop();
-                Debug.WriteLine($"GetCompaniesWithCreatedNotes: {sw.ElapsedMilliseconds / 1000}");
 
                 return companyNamesWithNotes;
             });
@@ -82,14 +90,123 @@ namespace GFIManager.Services
             return companies.Where(c => companiesWithNotes.Contains(c.DisplayName));
         }
 
-        public Task AddNotesForCompanies(IEnumerable<Company> notesToAdd)
+        public IDictionary<string, List<string>> GetDataForNotes(IEnumerable<Company> companies)
         {
-            throw new NotImplementedException();
+            return companies.AsParallel().Select(c => ProcessSingleCompany(c)).ToDictionary(k => k.Key, v => v.Value);
         }
 
-        public Task UpdateNotesForCompanies(IEnumerable<Company> notesToOverride)
+        public KeyValuePair<string, List<string>> ProcessSingleCompany(Company company)
         {
-            throw new NotImplementedException();
+            var files = Directory.GetFiles(company.DirectoryPath);
+
+            var filePath = files.First(f => f.EndsWith(Settings.Default.FinalGfiSuffix));
+
+            var bilancaValues = ProccessSingleSheet("H9", "J9", filePath, WorkbookType.Bilanca);
+            var rdgValues = ProccessSingleSheet("H8", "J8", filePath, WorkbookType.RDG);
+
+            return new KeyValuePair<string, List<string>>(company.DisplayName, bilancaValues.Concat(rdgValues).ToList());
+        }
+
+        private List<string> ProccessSingleSheet(string noteStartCell, string valueStartCell, string filePath, WorkbookType sheetName)
+        {
+            using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                var workbook = WorkbookFactory.Create(file);
+
+                var sheet = workbook.GetSheet(sheetName.ToString());
+
+                var noteStart = new CellReference(noteStartCell);
+                var valueStart = new CellReference(valueStartCell);
+
+                var noteColumnIndex = noteStart.Col;
+                var valueColumnIndex = valueStart.Col;
+
+                var startRow = noteStart.Row;
+                var valuesList = new List<string>();
+                for (int i = 0; i < sheet.LastRowNum - startRow; i++)
+                {
+                    var currentRow = sheet.GetRow(startRow + i);
+
+                    var currentCellValue = currentRow.GetCell(noteColumnIndex)?.StringCellValue;
+                    if (string.IsNullOrWhiteSpace(currentCellValue)) continue;
+
+                    var value = currentRow.GetCell(valueColumnIndex).NumericCellValue.ToString();
+                    valuesList.Add(value);
+                }
+
+                return valuesList;
+            }
+        }
+
+        public void AddNotesForCompanies(IDictionary<string, List<string>> notesToAdd)
+        {
+            using (FileStream file = new FileStream(notesFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var workbook = WorkbookFactory.Create(file);
+
+                var sheet = workbook.GetSheetAt(0);
+
+                var startingRow = sheet.GetRow(sheet.LastRowNum) == null ? sheet.LastRowNum : sheet.LastRowNum + 1;
+                var companiesArray = notesToAdd.ToArray();
+                Enumerable.Range(0, notesToAdd.Count())
+                    .ToList()
+                    .ForEach(i =>
+                    {
+                        var currentRow = sheet.CreateRow(startingRow + i);
+                        currentRow.CreateCell(0).SetCellValue(companiesArray.ElementAt(i).Key);
+                        SetCompanyRow(currentRow, companiesArray.ElementAt(i).Value.ToArray());
+
+                    });
+
+                FileStream outputStream = new FileStream(notesFilePath, FileMode.Create);
+                workbook.Write(outputStream);
+                outputStream.Close();
+            }           
+        }
+
+        public void UpdateNotesForCompanies(IDictionary<string, List<string>> notesToOverride)
+        {
+            using (FileStream file = new FileStream(notesFilePath, FileMode.Open, FileAccess.Read))
+            {
+                var workbook = WorkbookFactory.Create(file);
+
+                var sheet = workbook.GetSheetAt(0);
+
+                var companiesProcessed = 0;
+                for (int i = 0; i <= sheet.LastRowNum; i++)
+                {
+                    var currentRow = sheet.GetRow(i);
+                    var currentCompanyName = currentRow.GetCell(0).StringCellValue;
+                    var result = notesToOverride.TryGetValue(currentCompanyName, out List<string> valuesToUpdate);
+                    
+                    if (!result) continue;
+
+                    SetCompanyRow(currentRow, valuesToUpdate.ToArray());
+                    companiesProcessed++;
+
+                    if (companiesProcessed == notesToOverride.Count()) break;
+                }
+
+                FileStream outputStream = new FileStream(notesFilePath, FileMode.Create);
+                workbook.Write(outputStream);
+                outputStream.Close();
+            }
+        }
+
+        private void SetCompanyRow(IRow currentRow, params string[] values)
+        {
+            for (int i = 1; i <= values.Length; i++)
+            {
+                var cell = currentRow.GetCell(i);
+                if(cell == null)
+                {
+                    currentRow.CreateCell(i).SetCellValue(values[i - 1]);
+                } 
+                else
+                {
+                    cell.SetCellValue(values[i - 1]);
+                }
+            }
         }
     }
 }
