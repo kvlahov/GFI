@@ -92,7 +92,7 @@ namespace GFIManager.Services
 
         public IDictionary<string, List<string>> GetDataForNotes(IEnumerable<Company> companies)
         {
-            return companies.AsParallel().Select(c => ProcessSingleCompany(c)).ToDictionary(k => k.Key, v => v.Value);
+            return companies.Select(c => ProcessSingleCompany(c)).ToDictionary(k => k.Key, v => v.Value);
         }
 
         public KeyValuePair<string, List<string>> ProcessSingleCompany(Company company)
@@ -123,6 +123,9 @@ namespace GFIManager.Services
 
                 var startRow = noteStart.Row;
                 var valuesList = new List<string>();
+
+                HSSFFormulaEvaluator formula = new HSSFFormulaEvaluator(workbook);
+
                 for (int i = 0; i < sheet.LastRowNum - startRow; i++)
                 {
                     var currentRow = sheet.GetRow(startRow + i);
@@ -130,7 +133,10 @@ namespace GFIManager.Services
                     var currentCellValue = currentRow.GetCell(noteColumnIndex)?.StringCellValue;
                     if (string.IsNullOrWhiteSpace(currentCellValue)) continue;
 
-                    var value = currentRow.GetCell(valueColumnIndex).NumericCellValue.ToString();
+                    var cell = currentRow.GetCell(valueColumnIndex);
+                    formula.EvaluateInCell(cell);
+
+                    var value = cell.NumericCellValue.ToString();
                     valuesList.Add(value);
                 }
 
