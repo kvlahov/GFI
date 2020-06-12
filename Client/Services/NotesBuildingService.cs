@@ -14,10 +14,10 @@ using System.Threading.Tasks;
 
 namespace GFIManager.Services
 {
-    public class NotesBuildingService : ExcelBaseService
+    public class NotesBuildingService
     {
         private readonly string root;
-        private string notesFilePath;
+        private readonly string notesFilePath;
 
         public NotesBuildingService(string rootDir)
         {
