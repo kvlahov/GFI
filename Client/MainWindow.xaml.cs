@@ -75,7 +75,7 @@ namespace Client
 
             catch (Exception ex)
             {
-                ShowErrorMessage(ex.Message);
+                HandleException(ex);
             }
         }
 
@@ -175,7 +175,7 @@ namespace Client
             }
             catch (Exception ex)
             {
-                Dispatcher.Invoke(() => ShowErrorMessage(ex.Message));
+                HandleException(ex);
             }
 
             sw.Stop();
@@ -185,14 +185,27 @@ namespace Client
               {
                   Loader.Visibility = Visibility.Hidden;
                   var sb = new StringBuilder();
-                  sb.Append("Obrada završena");
-                  sb.Append(Environment.NewLine);
-                  sb.Append($"Proteklo vremena: {TimeSpan.FromMilliseconds(sw.ElapsedMilliseconds):mm\\:ss}");
+                  sb.AppendLine("Obrada završena");
+                  sb.Append($"Proteklo vremena: {sw.ElapsedMilliseconds / 1000f}s");
                   ShowInfoDialog(sb.ToString(), "Završeno");
                   LoadCompanies();
 
                   await NotesControl.RefreshCompaniesAsync();
               });
+        }
+
+        private void HandleException(Exception ex)
+        {
+            var messages = new List<string>();
+            do
+            {
+                messages.Add(ex.Message);
+                ex = ex.InnerException;
+            }
+            while (ex != null);
+            var message = string.Join(Environment.NewLine, messages);
+
+            Dispatcher.Invoke(() => ShowErrorMessage(message));
         }
 
         private async void BtnDirInfo_Click(object sender, RoutedEventArgs e)

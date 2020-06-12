@@ -8,7 +8,7 @@
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:ViewModels="clr-namespace:GFIManager.ViewModels" x:Class="GFIManager.View.User_controls.PrepareNotesControl"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="700" Loaded="UserControl_Loaded">
+             d:DesignHeight="450" d:DesignWidth="700">
     <UserControl.Background>
         <SolidColorBrush Color="{DynamicResource White}"/>
     </UserControl.Background>

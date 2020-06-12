@@ -2,21 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Office.Interop;
 using GFIManager.Models;
-using Microsoft.Office.Interop.Excel;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using GFIManager.Properties;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace GFIManager.Services
 {
-    public class GfiBuilderService : ExcelBaseService
+    public class GfiBuilderService
     {
         private readonly IEnumerable<Company> companies;
         private readonly IDictionary<WorkbookType, WorksheetInfo> workbooksInfo;

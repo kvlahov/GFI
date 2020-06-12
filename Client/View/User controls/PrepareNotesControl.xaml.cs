@@ -35,11 +35,7 @@ namespace GFIManager.View.User_controls
             ViewModel = new PrepareNotesViewModel();
             DataContext = ViewModel;
             Task.Run(() => LoadCompaniesAsync().ConfigureAwait(false));
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
+        }        
 
         public async Task RefreshCompaniesAsync()
         {
@@ -66,6 +62,7 @@ namespace GFIManager.View.User_controls
             });
         }
 
+        #region Events
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e) => LbValidCompanies.SelectAll();
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e) => LbValidCompanies.UnselectAll();
@@ -112,7 +109,7 @@ namespace GFIManager.View.User_controls
 
                 service.AddNotesForCompanies(dataToAdd);
                 service.UpdateNotesForCompanies(dataToOverride);
-                
+
                 OnBackgroundWorkEnd?.Invoke();
 
                 await ShowInfoDialog("Podaci za bilješke spremljeni.", "Kraj operacije");
@@ -121,10 +118,12 @@ namespace GFIManager.View.User_controls
             }
             catch (Exception ex)
             {
-                ShowErrorMessage(ex.Message);
+
+                HandleException(ex);
                 OnBackgroundWorkEnd?.Invoke();
             }
-        }
+        } 
+        #endregion
 
         private string GetOverrideMessage(List<Company> notesToOverride)
         {
@@ -135,6 +134,20 @@ namespace GFIManager.View.User_controls
                 .ForEach(c => sb.AppendLine(c));
             sb.Append("Podaci za odabrane firme će se prepisati. Jeste li sigurni da to želite?");
             return sb.ToString();
+        }
+        
+        private void HandleException(Exception ex)
+        {
+            var messages = new List<string>();
+            do
+            {
+                messages.Add(ex.Message);
+                ex = ex.InnerException;
+            }
+            while (ex != null);
+            var message = string.Join(Environment.NewLine, messages);
+
+            Dispatcher.Invoke(() => ShowErrorMessage(message));
         }
 
         private MessageBoxResult ShowConfirmationDialog(string message, string title)
