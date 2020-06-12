@@ -96,20 +96,10 @@ namespace GFIManager.Services
             var startFile = filePaths.First(p => p.EndsWith(Settings.Default.OldGfiSuffix));
 
             var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix;
-            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);
-
-            //create copy and load it
-            using (FileStream file = new FileStream(startFile, FileMode.Open, FileAccess.Read))
-            {
-                var wb = WorkbookFactory.Create(file);
-
-                FileStream outputStream = new FileStream(newFilePath, FileMode.Create);
-                wb.Write(outputStream);
-                outputStream.Close();
-            }
+            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);            
 
             IWorkbook workbook;
-            using (FileStream file = new FileStream(newFilePath, FileMode.Open, FileAccess.Read))
+            using (FileStream file = new FileStream(startFile, FileMode.Open, FileAccess.Read))
             {
                 workbook = WorkbookFactory.Create(file);
             }
@@ -144,25 +134,35 @@ namespace GFIManager.Services
 
                 //get data from source sheet
                 var sourceRange = CellRangeAddress.ValueOf(sourceWorksheetsRanges[workbookType]);
-                var sourceValues = Enumerable.Range(sourceRange.FirstRow, sourceRange.LastRow)
+                var sourceValues = Enumerable.Range(sourceRange.FirstRow, sourceRange.LastRow - sourceRange.FirstRow + 1)
                     .Select(i => new
                     {
-                        Aop = sourceSheet.GetRow(i).GetCell(sourceRange.FirstColumn).StringCellValue,
-                        Value = sourceSheet.GetRow(i).GetCell(sourceRange.LastColumn).NumericCellValue
+                        Aop = sourceSheet.GetRow(i).GetCell(sourceRange.FirstColumn)?.StringCellValue,
+                        Value = GetCellValueAsString(sourceSheet.GetRow(i).GetCell(sourceRange.LastColumn))
                     })
+                    .Where(m => !string.IsNullOrEmpty(m.Aop))
+                    .Where(m => int.TryParse(m.Aop, out int _))
                     .ToDictionary(c => c.Aop, c => c.Value);
 
+                //set data on target sheet (of final GFI)
                 var targetRange = CellRangeAddress.ValueOf(workbooksInfo[workbookType].Range);
                 for (int i = targetRange.FirstRow; i <= targetRange.LastRow; i++)
                 {
                     if (targetSheet.GetRow(i).GetCell(targetRange.LastColumn).CellStyle.IsLocked) continue;
-                    var aop = targetSheet.GetRow(i).GetCell(targetRange.FirstColumn).StringCellValue;
-                    targetSheet.GetRow(i).GetCell(targetRange.FirstColumn).SetCellValue(sourceValues[aop]);
+                    var aopDouble = targetSheet.GetRow(i).GetCell(targetRange.FirstColumn).NumericCellValue;
+                    var aop = Convert.ToInt32(aopDouble).ToString("D3");
+                    var newValue = string.IsNullOrEmpty(sourceValues[aop]) ? 0 : Convert.ToInt32(sourceValues[aop]);
+                    targetSheet.GetRow(i).GetCell(targetRange.LastColumn).SetCellValue(newValue);
                 }
             }
 
             targetSheet.ForceFormulaRecalculation = true;
         }
 
+        private string GetCellValueAsString(ICell cell)
+        {
+            DataFormatter dataFormatter = new DataFormatter();
+            return dataFormatter.FormatCellValue(cell);
+        }
     }
 }
