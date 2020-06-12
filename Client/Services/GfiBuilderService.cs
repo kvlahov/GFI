@@ -10,6 +10,9 @@ using Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using GFIManager.Properties;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace GFIManager.Services
 {
@@ -93,68 +96,73 @@ namespace GFIManager.Services
             var startFile = filePaths.First(p => p.EndsWith(Settings.Default.OldGfiSuffix));
 
             var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix;
-
-            Application xlApp = new Application();
-            Workbook xlWorkbook = xlApp.Workbooks.Open(startFile);
-            xlApp.DisplayAlerts = false;
-            xlApp.ScreenUpdating = false;
-            xlApp.Calculation = XlCalculation.xlCalculationManual;
-
             var newFilePath = Path.Combine(company.DirectoryPath, newFileName);
 
             //create copy and load it
-            xlWorkbook.SaveCopyAs(newFilePath);
-            xlWorkbook.Close(false);
-            xlWorkbook = xlApp.Workbooks.Open(newFilePath);
+            using (FileStream file = new FileStream(startFile, FileMode.Open, FileAccess.Read))
+            {
+                var wb = WorkbookFactory.Create(file);
+
+                FileStream outputStream = new FileStream(newFilePath, FileMode.Create);
+                wb.Write(outputStream);
+                outputStream.Close();
+            }
+
+            IWorkbook workbook;
+            using (FileStream file = new FileStream(newFilePath, FileMode.Open, FileAccess.Read))
+            {
+                workbook = WorkbookFactory.Create(file);
+            }
 
             //process each sheet
-            _Worksheet xlWorksheet = xlWorkbook.Sheets[WorkbookType.Bilanca.ToString()];
-            ProcessSingleSheet(company.DirectoryPath, xlWorksheet, xlApp, WorkbookType.Bilanca);
+            var sheet = workbook.GetSheet(WorkbookType.Bilanca.ToString());
+            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Bilanca);
 
-            xlWorksheet = xlWorkbook.Sheets[WorkbookType.RDG.ToString()];
-            ProcessSingleSheet(company.DirectoryPath, xlWorksheet, xlApp, WorkbookType.RDG);
+            sheet = workbook.GetSheet(WorkbookType.RDG.ToString());
+            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.RDG);
 
-            xlWorksheet = xlWorkbook.Sheets[WorkbookType.Dodatni.ToString()];
-            ProcessSingleSheet(company.DirectoryPath, xlWorksheet, xlApp, WorkbookType.Dodatni);
+            sheet = workbook.GetSheet(WorkbookType.Dodatni.ToString());
+            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Dodatni);            
 
-            xlApp.Calculation = XlCalculation.xlCalculationAutomatic;
-            xlApp.Calculate();
-
-            xlWorkbook.Close(true);
-            xlApp.Quit();
-
-            ReleaseObject(xlWorkbook);
-            ReleaseObject(xlApp);
+            //save
+            using (FileStream outputStream = new FileStream(newFilePath, FileMode.Create))
+            {
+                workbook.Write(outputStream);
+                outputStream.Close();
+            }
         }
 
-        private void ProcessSingleSheet(string directoryPath, _Worksheet targetSheet, Application xlApp, WorkbookType workbookType)
+        private void ProcessSingleSheet(string directoryPath, ISheet targetSheet, WorkbookType workbookType)
         {
             var filePath = Path.Combine(directoryPath, workbooksInfo[workbookType].FileName);
-            var workbook = xlApp.Workbooks.Open(filePath);
+            targetSheet.ForceFormulaRecalculation = false;
 
-            _Worksheet sourceSheet = workbook.Sheets[1];
-            var range = workbooksInfo[workbookType].Range;
+            using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                var wb = WorkbookFactory.Create(file);
+                var sourceSheet = wb.GetSheetAt(0);
 
-            var columnsCount = targetSheet.Range[range].Rows[1].Columns.Count;
-            targetSheet.Range[range].Rows.Cast<Range>()
-                .Where(r => !r.Cells[columnsCount].Locked)
-                .Select(r => new
+                //get data from source sheet
+                var sourceRange = CellRangeAddress.ValueOf(sourceWorksheetsRanges[workbookType]);
+                var sourceValues = Enumerable.Range(sourceRange.FirstRow, sourceRange.LastRow)
+                    .Select(i => new
+                    {
+                        Aop = sourceSheet.GetRow(i).GetCell(sourceRange.FirstColumn).StringCellValue,
+                        Value = sourceSheet.GetRow(i).GetCell(sourceRange.LastColumn).NumericCellValue
+                    })
+                    .ToDictionary(c => c.Aop, c => c.Value);
+
+                var targetRange = CellRangeAddress.ValueOf(workbooksInfo[workbookType].Range);
+                for (int i = targetRange.FirstRow; i <= targetRange.LastRow; i++)
                 {
-                    Aop = Convert.ToInt32(r.Cells[1].Value).ToString("D3"),
-                    CurrentYear = r.Cells[columnsCount]
-                })
-                .ToList()
-                .ForEach(r =>
-                {
-                    var sourceRange = sourceWorksheetsRanges[workbookType];
-                    var value = sourceSheet.Range[sourceRange].Rows.Cast<Range>().First(row => Convert.ToString(row.Columns[1].Value) == r.Aop).Columns.Cast<Range>().Last().Value;
-                    r.CurrentYear.Value = Convert.ToInt32(value);
-                });
+                    if (targetSheet.GetRow(i).GetCell(targetRange.LastColumn).CellStyle.IsLocked) continue;
+                    var aop = targetSheet.GetRow(i).GetCell(targetRange.FirstColumn).StringCellValue;
+                    targetSheet.GetRow(i).GetCell(targetRange.FirstColumn).SetCellValue(sourceValues[aop]);
+                }
+            }
 
-            workbook.Close();
-            ReleaseObject(sourceSheet);
-            ReleaseObject(workbook);
+            targetSheet.ForceFormulaRecalculation = true;
         }
-        
+
     }
 }

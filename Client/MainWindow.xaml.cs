@@ -175,7 +175,7 @@ namespace Client
             }
             catch (Exception ex)
             {
-                ShowErrorMessage(ex.Message);
+                Dispatcher.Invoke(() => ShowErrorMessage(ex.Message));
             }
 
             sw.Stop();
