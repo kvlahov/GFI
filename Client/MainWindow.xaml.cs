@@ -107,6 +107,7 @@ namespace Client
 
             dialog.ShowAsync();
         }
+
         private void ShowChooseFolderDialog()
         {
             var chooseFileDialog = new ChooseRootFolderView
@@ -149,9 +150,11 @@ namespace Client
         #endregion
 
         #region Events
-        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        private async void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
             ShowChooseFolderDialog();
+            LoadCompanies();
+            await NotesControl.RefreshCompaniesAsync();
         }
 
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e) => LbDirectories.SelectAll();
