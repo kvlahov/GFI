@@ -112,7 +112,8 @@ namespace Client
         {
             var chooseFileDialog = new ChooseRootFolderView
             {
-                ChosenFolder = Settings.Default.RootDir
+                ChosenFolder = Settings.Default.RootDir,
+                Owner = this
             };
 
             chooseFileDialog.ShowDialog();
@@ -123,7 +124,7 @@ namespace Client
             }
         }
 
-        private void ShowInfoDialog(string message, string title)
+        private async Task ShowInfoDialog(string message, string title)
         {
             var dialog = new ContentDialog
             {
@@ -133,7 +134,7 @@ namespace Client
                 DefaultButton = ContentDialogButton.Close
             };
 
-            dialog.ShowAsync();
+            await dialog.ShowAsync();
         }
 
         private MessageBoxResult ShowConfirmationDialog(string message, string title)
@@ -165,6 +166,14 @@ namespace Client
         {
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
             var validCompanies = new DirectoryService(Settings.Default.RootDir).GetCompaniesWithoutNewGfi().Intersect(selectedCompanies);
+
+            var skipCompanies = selectedCompanies.Except(validCompanies).Select(c => c.DisplayName);
+            if(skipCompanies.Any())
+            {
+                var msg = $"Preskačem sljedeće firme jer nedostaje datoteka ili imaju već izrađen GFI: {string.Join(", ", skipCompanies)}";
+                await ShowInfoDialog(msg, "Neispravne firme označene");
+            }
+
             var service = new GfiBuilderService(validCompanies);
 
             Loader.Visibility = Visibility.Visible;
@@ -190,7 +199,7 @@ namespace Client
                   var sb = new StringBuilder();
                   sb.AppendLine("Obrada završena");
                   sb.Append($"Proteklo vremena: {sw.ElapsedMilliseconds / 1000f}s");
-                  ShowInfoDialog(sb.ToString(), "Završeno");
+                  await ShowInfoDialog(sb.ToString(), "Završeno");
                   LoadCompanies();
 
                   await NotesControl.RefreshCompaniesAsync();

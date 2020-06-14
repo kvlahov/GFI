@@ -92,7 +92,7 @@ namespace GFIManager.Services
 
         public IDictionary<string, List<string>> GetDataForNotes(IEnumerable<Company> companies)
         {
-            return companies.Select(c => ProcessSingleCompany(c)).ToDictionary(k => k.Key, v => v.Value);
+            return companies.AsParallel().Select(c => ProcessSingleCompany(c)).ToDictionary(k => k.Key, v => v.Value);
         }
 
         public KeyValuePair<string, List<string>> ProcessSingleCompany(Company company)
@@ -204,13 +204,14 @@ namespace GFIManager.Services
             for (int i = 1; i <= values.Length; i++)
             {
                 var cell = currentRow.GetCell(i);
-                if(cell == null)
+                var value = Convert.ToInt64(values[i - 1]);
+                if (cell == null)
                 {
-                    currentRow.CreateCell(i).SetCellValue(values[i - 1]);
+                    currentRow.CreateCell(i).SetCellValue(value);
                 } 
                 else
                 {
-                    cell.SetCellValue(values[i - 1]);
+                    cell.SetCellValue(value);
                 }
             }
         }

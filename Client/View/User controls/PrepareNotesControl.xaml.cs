@@ -51,8 +51,8 @@ namespace GFIManager.View.User_controls
 
             var generatedNotesCompanies = await createdNotesTask;
             var invalidCompanies = await invalidCompaniesTask;
-            var validCompanies = service.GetCompaniesWithCreatedGfi().Except(generatedNotesCompanies).Except(invalidCompanies);
-            //var validCompanies = service.GetCompaniesWithCreatedGfi();
+            //var validCompanies = service.GetCompaniesWithCreatedGfi().Except(generatedNotesCompanies).Except(invalidCompanies);
+            var validCompanies = service.GetCompaniesWithCreatedGfi();
 
             Dispatcher.Invoke(() =>
             {
@@ -101,7 +101,7 @@ namespace GFIManager.View.User_controls
 
             await ShowInfoDialog("Izrađujem podatke za bilješke", "Obrada");
             OnBackgroundWorkStart?.Invoke();
-
+            await Task.Delay(2000);
             try
             {
                 var dataToAdd = service.GetDataForNotes(notesToAdd);
