@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Client"
+        xmlns:local="clr-namespace:GFIManager"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:con="clr-namespace:GFIManager.View.User_controls"
-        xmlns:ViewModels="clr-namespace:GFIManager.ViewModels" x:Class="Client.MainWindow"
+        xmlns:ViewModels="clr-namespace:GFIManager.ViewModels" x:Class="GFIManager.MainWindow"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
         Title="GFI Manager" Height="500" Width="700" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closing="Window_Closing">

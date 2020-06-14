@@ -51,8 +51,8 @@ namespace GFIManager.View.User_controls
 
             var generatedNotesCompanies = await createdNotesTask;
             var invalidCompanies = await invalidCompaniesTask;
-            //var validCompanies = service.GetCompaniesWithCreatedGfi().Except(generatedNotesCompanies).Except(invalidCompanies);
-            var validCompanies = service.GetCompaniesWithCreatedGfi();
+            var validCompanies = service.GetCompaniesWithCreatedGfi().Except(generatedNotesCompanies).Except(invalidCompanies);
+            //var validCompanies = service.GetCompaniesWithCreatedGfi();
 
             Dispatcher.Invoke(() =>
             {

@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("GFIManager")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Created by Krešimir Vlahov")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("GFIManager")]

@@ -24,7 +24,7 @@ using GFIManager.View.User_controls;
 using GFIManager.ViewModels;
 using ModernWpf.Controls;
 
-namespace Client
+namespace GFIManager
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
