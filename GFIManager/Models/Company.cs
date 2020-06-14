@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GFIManager.Models
 {
     public class Company
     {
         private string _name;
+
         public string DisplayName
         {
             get => _name;
@@ -19,6 +15,7 @@ namespace GFIManager.Models
                 _name = ToTitleCase(value);
             }
         }
+
         public string DirectoryPath { get; set; }
 
         public Company(string dirPath)
@@ -35,7 +32,7 @@ namespace GFIManager.Models
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value.ToLower());
         }
 
-        public override bool Equals(object obj) => 
+        public override bool Equals(object obj) =>
             obj is Company other && DisplayName.Equals(other.DisplayName);
 
         public override int GetHashCode() => DisplayName.GetHashCode();

@@ -1,12 +1,12 @@
-﻿using System;
+﻿using GFIManager.Models;
+using GFIManager.Properties;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GFIManager.Models;
-using GFIManager.Properties;
-using NPOI.SS.UserModel;
-using NPOI.SS.Util;
 
 namespace GFIManager.Services
 {
@@ -90,7 +90,7 @@ namespace GFIManager.Services
             var startFile = filePaths.First(p => p.EndsWith(Settings.Default.OldGfiSuffix));
 
             var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix;
-            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);            
+            var newFilePath = Path.Combine(company.DirectoryPath, newFileName);
 
             IWorkbook workbook;
             using (FileStream file = new FileStream(startFile, FileMode.Open, FileAccess.Read))
@@ -106,7 +106,7 @@ namespace GFIManager.Services
             ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.RDG);
 
             sheet = workbook.GetSheet(WorkbookType.Dodatni.ToString());
-            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Dodatni);            
+            ProcessSingleSheet(company.DirectoryPath, sheet, WorkbookType.Dodatni);
 
             //save
             using (FileStream outputStream = new FileStream(newFilePath, FileMode.Create))

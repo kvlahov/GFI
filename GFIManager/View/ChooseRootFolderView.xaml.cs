@@ -1,18 +1,6 @@
 ﻿using GFIManager.Properties;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Windows;
 
 namespace GFIManager.View
 {
@@ -22,15 +10,17 @@ namespace GFIManager.View
     public partial class ChooseRootFolderView : Window
     {
         private string _chosenFolder;
+
         public string ChosenFolder
         {
-            get => _chosenFolder; 
+            get => _chosenFolder;
             set
             {
                 _chosenFolder = value;
                 TbChosenFolder.Text = value;
             }
         }
+
         public ChooseRootFolderView()
         {
             InitializeComponent();

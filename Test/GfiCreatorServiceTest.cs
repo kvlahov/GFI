@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GFIManager.Models;
-using GFIManager.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test
 {
@@ -20,7 +17,6 @@ namespace Test
             var root = "C:/Users/evlakre/Downloads/GFI/2019";
             allCompanies = Directory.GetDirectories(root).Select(d => new Company(d));
         }
-
 
         [TestMethod]
         public void BuildGfiTest()

@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using GFIManager.Models;
+﻿using GFIManager.Models;
 using GFIManager.Properties;
 using GFIManager.Services;
 using GFIManager.View;
 using GFIManager.View.User_controls;
 using GFIManager.ViewModels;
 using ModernWpf.Controls;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace GFIManager
 {
@@ -32,6 +24,7 @@ namespace GFIManager
     public partial class MainWindow : Window
     {
         public MainWindowViewModel ViewModel { get; private set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -72,7 +65,6 @@ namespace GFIManager
                 var companies = service.GetCompaniesWithoutNewGfi();
                 ViewModel.SetCompanies(companies);
             }
-
             catch (Exception ex)
             {
                 HandleException(ex);
@@ -95,6 +87,7 @@ namespace GFIManager
         }
 
         #region Dialogs
+
         private void ShowErrorMessage(string message)
         {
             var dialog = new ContentDialog
@@ -148,9 +141,10 @@ namespace GFIManager
             );
         }
 
-        #endregion
+        #endregion Dialogs
 
         #region Events
+
         private async void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
             ShowChooseFolderDialog();
@@ -168,7 +162,7 @@ namespace GFIManager
             var validCompanies = new DirectoryService(Settings.Default.RootDir).GetCompaniesWithoutNewGfi().Intersect(selectedCompanies);
 
             var skipCompanies = selectedCompanies.Except(validCompanies).Select(c => c.DisplayName);
-            if(skipCompanies.Any())
+            if (skipCompanies.Any())
             {
                 var msg = $"Preskačem sljedeće firme jer nedostaje datoteka ili imaju već izrađen GFI: {string.Join(", ", skipCompanies)}";
                 await ShowInfoDialog(msg, "Neispravne firme označene");
@@ -247,7 +241,7 @@ namespace GFIManager
                 e.Cancel = true;
             }
         }
-        #endregion
 
+        #endregion Events
     }
 }

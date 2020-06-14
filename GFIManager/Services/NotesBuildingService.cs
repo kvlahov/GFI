@@ -1,6 +1,5 @@
 ﻿using GFIManager.Models;
 using GFIManager.Properties;
-using Microsoft.Office.Interop.Excel;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -9,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GFIManager.Services
@@ -35,11 +33,10 @@ namespace GFIManager.Services
                 workbook.CreateSheet();
                 //set headers
 
-                using(FileStream outputStream = new FileStream(path, FileMode.Create))
+                using (FileStream outputStream = new FileStream(path, FileMode.Create))
                 {
                     workbook.Write(outputStream);
                 }
-
             }
         }
 
@@ -61,10 +58,9 @@ namespace GFIManager.Services
 
             sw.Stop();
 
-            Debug.WriteLine($"CompanyHasInvalidGfiFaster: {sw.ElapsedMilliseconds/1000f}s");
+            Debug.WriteLine($"CompanyHasInvalidGfiFaster: {sw.ElapsedMilliseconds / 1000f}s");
 
             return !string.IsNullOrEmpty(res);
-
         }
 
         public async Task<IEnumerable<Company>> GetCompaniesWithCreatedNotes(IEnumerable<Company> companies)
@@ -161,13 +157,12 @@ namespace GFIManager.Services
                         var currentRow = sheet.CreateRow(startingRow + i);
                         currentRow.CreateCell(0).SetCellValue(companiesArray.ElementAt(i).Key);
                         SetCompanyRow(currentRow, companiesArray.ElementAt(i).Value.ToArray());
-
                     });
 
                 FileStream outputStream = new FileStream(notesFilePath, FileMode.Create);
                 workbook.Write(outputStream);
                 outputStream.Close();
-            }           
+            }
         }
 
         public void UpdateNotesForCompanies(IDictionary<string, List<string>> notesToOverride)
@@ -184,7 +179,7 @@ namespace GFIManager.Services
                     var currentRow = sheet.GetRow(i);
                     var currentCompanyName = currentRow.GetCell(0).StringCellValue;
                     var result = notesToOverride.TryGetValue(currentCompanyName, out List<string> valuesToUpdate);
-                    
+
                     if (!result) continue;
 
                     SetCompanyRow(currentRow, valuesToUpdate.ToArray());
@@ -208,7 +203,7 @@ namespace GFIManager.Services
                 if (cell == null)
                 {
                     currentRow.CreateCell(i).SetCellValue(value);
-                } 
+                }
                 else
                 {
                     cell.SetCellValue(value);

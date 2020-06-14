@@ -8,7 +8,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemeResources AccentColor="#4F5D75"/>
+                <ui:ThemeResources AccentColor="#4F5D75" />
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
 
@@ -19,7 +19,6 @@
             <Color x:Key="White">White</Color>
             <Color x:Key="Orange">#EF8354</Color>
             <FontFamily x:Key="MainFont">Lucida Sans</FontFamily>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

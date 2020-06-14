@@ -1,8 +1,5 @@
-﻿using System;
-using System.Configuration;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
-using GFIManager.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test
 {
@@ -36,11 +33,10 @@ namespace Test
             var dirService = new DirectoryService(root);
 
             var companies = dirService.GetCompaniesWithCreatedGfi();
-            
+
             var res = sut.GetCompaniesWithCreatedNotes(companies);
 
             //Assert.AreNotEqual(res.Count(), 0);
-
         }
 
         [TestMethod]

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GFIManager.Services
@@ -14,6 +13,7 @@ namespace GFIManager.Services
         private readonly string root;
         private readonly IEnumerable<Company> companies;
         private readonly NotesBuildingService notesService;
+
         public DirectoryService(string rootDir)
         {
             root = rootDir;
@@ -53,7 +53,7 @@ namespace GFIManager.Services
                 .Where(c => c.Files.Any(f => f.EndsWith(Settings.Default.FinalGfiSuffix)))
                 .Select(c => c.Company);
         }
-        
+
         public IEnumerable<Company> GetCompaniesWithoutNewGfi()
         {
             var missingFilesCompanies = GetCompaniesWithMissingFiles();

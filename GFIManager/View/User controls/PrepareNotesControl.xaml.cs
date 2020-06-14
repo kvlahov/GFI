@@ -10,13 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GFIManager.View.User_controls
 {
@@ -28,14 +21,16 @@ namespace GFIManager.View.User_controls
         public PrepareNotesViewModel ViewModel { get; private set; }
 
         public event Action OnBackgroundWorkStart;
+
         public event Action OnBackgroundWorkEnd;
+
         public PrepareNotesControl()
         {
             InitializeComponent();
             ViewModel = new PrepareNotesViewModel();
             DataContext = ViewModel;
             Task.Run(() => LoadCompaniesAsync().ConfigureAwait(false));
-        }        
+        }
 
         public async Task RefreshCompaniesAsync()
         {
@@ -47,7 +42,7 @@ namespace GFIManager.View.User_controls
             var service = new DirectoryService(Settings.Default.RootDir);
 
             var createdNotesTask = service.GetCompaniesWithCreatedNotes().ConfigureAwait(false);
-            var invalidCompaniesTask = service.GetCompaniesWithInvalidGfi().ConfigureAwait(false);            
+            var invalidCompaniesTask = service.GetCompaniesWithInvalidGfi().ConfigureAwait(false);
 
             var generatedNotesCompanies = await createdNotesTask;
             var invalidCompanies = await invalidCompaniesTask;
@@ -63,6 +58,7 @@ namespace GFIManager.View.User_controls
         }
 
         #region Events
+
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e) => LbValidCompanies.SelectAll();
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e) => LbValidCompanies.UnselectAll();
@@ -118,12 +114,12 @@ namespace GFIManager.View.User_controls
             }
             catch (Exception ex)
             {
-
                 HandleException(ex);
                 OnBackgroundWorkEnd?.Invoke();
             }
-        } 
-        #endregion
+        }
+
+        #endregion Events
 
         private string GetOverrideMessage(List<Company> notesToOverride)
         {
@@ -135,7 +131,7 @@ namespace GFIManager.View.User_controls
             sb.Append("Podaci za odabrane firme će se prepisati. Jeste li sigurni da to želite?");
             return sb.ToString();
         }
-        
+
         private void HandleException(Exception ex)
         {
             var messages = new List<string>();
@@ -186,6 +182,5 @@ namespace GFIManager.View.User_controls
 
             dialog.ShowAsync();
         }
-
     }
 }

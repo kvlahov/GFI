@@ -12,15 +12,15 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         Title="GFI Manager" Height="500" Width="700" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Window.DataContext>
-        <ViewModels:MainWindowViewModel/>
+        <ViewModels:MainWindowViewModel />
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TabControl>
             <TabControl.Background>
-                <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+                <SolidColorBrush Color="{DynamicResource DarkBlue}" />
             </TabControl.Background>
             <TabControl.Resources>
                 <Style x:Key="TabItemText" TargetType="{x:Type TextBlock}">
@@ -28,14 +28,14 @@
                         <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
                             <Setter Property="Foreground">
                                 <Setter.Value>
-                                    <SolidColorBrush Color="{DynamicResource Dark}"/>
+                                    <SolidColorBrush Color="{DynamicResource Dark}" />
                                 </Setter.Value>
                             </Setter>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="False">
                             <Setter Property="Foreground">
                                 <Setter.Value>
-                                    <SolidColorBrush Color="{DynamicResource LightGrey}"/>
+                                    <SolidColorBrush Color="{DynamicResource LightGrey}" />
                                 </Setter.Value>
                             </Setter>
                         </DataTrigger>
@@ -44,23 +44,23 @@
             </TabControl.Resources>
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="GFI" Style="{StaticResource TabItemText}"/>
+                    <TextBlock Text="GFI" Style="{StaticResource TabItemText}" />
                 </TabItem.Header>
                 <Grid>
                     <Grid Margin="30 30 10 30">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Grid Margin="0 0 0 10">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
                             <ListBox x:Name="LbDirectories" Grid.Row="1" SelectionMode="Multiple" ItemsSource="{Binding Companies}" SelectionChanged="LbDirectories_SelectionChanged">
@@ -91,7 +91,7 @@
                                                         <ControlTemplate>
                                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" TextWrapping="Wrap">
                                                                 <TextBlock.Foreground>
-                                                                    <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+                                                                    <SolidColorBrush Color="{DynamicResource DarkBlue}" />
                                                                 </TextBlock.Foreground>GFI-ovi su kreirani za sve firme</TextBlock>
                                                         </ControlTemplate>
                                                     </Setter.Value>
@@ -102,33 +102,32 @@
                                 </ListBox.Style>
 
                                 <ListBox.Background>
-                                    <SolidColorBrush Color="{DynamicResource LightGrey}"/>
+                                    <SolidColorBrush Color="{DynamicResource LightGrey}" />
                                 </ListBox.Background>
-
                             </ListBox>
                         </Grid>
 
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Button x:Name="BtnDeselectAll" HorizontalAlignment="Stretch" Margin="0,0,5,0" Content="Makni oznaku sa svih" Click="BtnDeselectAll_Click">
                                 <Button.Background>
-                                    <SolidColorBrush Color="{DynamicResource Grey}"/>
+                                    <SolidColorBrush Color="{DynamicResource Grey}" />
                                 </Button.Background>
                             </Button>
                             <Button x:Name="BtnSelectAll" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5,0,0,0" Content="Označi sve" Click="BtnSelectAll_Click">
                                 <Button.Background>
-                                    <SolidColorBrush Color="{DynamicResource Grey}"/>
+                                    <SolidColorBrush Color="{DynamicResource Grey}" />
                                 </Button.Background>
                             </Button>
 
-                            <Button x:Name="BtnBuildGfi" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10,0,0" Style="{StaticResource AccentButtonStyle}" Content="Izradi GFI" Click="BtnBuildGfi_Click" IsEnabled="{Binding AreItemsSelected}"/>
+                            <Button x:Name="BtnBuildGfi" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10,0,0" Style="{StaticResource AccentButtonStyle}" Content="Izradi GFI" Click="BtnBuildGfi_Click" IsEnabled="{Binding AreItemsSelected}" />
                         </Grid>
 
                         <ui:SimpleStackPanel Grid.Column="1" Spacing="5">
@@ -136,26 +135,25 @@
                             <Button HorizontalAlignment="Stretch" MaxWidth="66" Background="{x:Null}" Click="BtnDirInfo_Click" Name="BtnDirInfo">
                                 <fa:ImageAwesome Icon="InfoCircle" Width="30">
                                     <fa:ImageAwesome.Foreground>
-                                        <SolidColorBrush Color="{DynamicResource DarkBlue}"/>
+                                        <SolidColorBrush Color="{DynamicResource DarkBlue}" />
                                     </fa:ImageAwesome.Foreground>
                                 </fa:ImageAwesome>
                             </Button>
                         </ui:SimpleStackPanel>
-
                     </Grid>
                 </Grid>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="Bilješke" Style="{StaticResource TabItemText}"/>
+                    <TextBlock Text="Bilješke" Style="{StaticResource TabItemText}" />
                 </TabItem.Header>
-                <con:PrepareNotesControl x:Name="NotesControl"/>
+                <con:PrepareNotesControl x:Name="NotesControl" />
             </TabItem>
         </TabControl>
         <Button x:Name="BtnSettings" Height="40" OpacityMask="White" Background="{x:Null}" Click="BtnSettings_Click" HorizontalAlignment="Right" VerticalAlignment="Top">
             <fa:ImageAwesome Icon="Cog">
                 <fa:ImageAwesome.Foreground>
-                    <SolidColorBrush Color="{DynamicResource Orange}"/>
+                    <SolidColorBrush Color="{DynamicResource Orange}" />
                 </fa:ImageAwesome.Foreground>
             </fa:ImageAwesome>
         </Button>
@@ -165,23 +163,22 @@
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground">
                             <Setter.Value>
-                                <SolidColorBrush Color="{DynamicResource LightGrey}"/>
+                                <SolidColorBrush Color="{DynamicResource LightGrey}" />
                             </Setter.Value>
                         </Setter>
                     </Style>
                 </ui:SimpleStackPanel.Resources>
-                <TextBlock Text="Obrađujem podatke. Molim pričekajte..." FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <ui:ProgressBar IsIndeterminate="True" >
+                <TextBlock Text="Obrađujem podatke. Molim pričekajte..." FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <ui:ProgressBar IsIndeterminate="True">
                     <ui:ProgressBar.Foreground>
-                        <SolidColorBrush Color="{DynamicResource Orange}"/>
+                        <SolidColorBrush Color="{DynamicResource Orange}" />
                     </ui:ProgressBar.Foreground>
                 </ui:ProgressBar>
                 <ui:SimpleStackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" Name="ElapsedTimeContainer">
-                    <TextBlock Text="Prošlo vremena:" FontSize="24"/>
-                    <TextBlock FontSize="24" Name="LbElapsedTime"/>
+                    <TextBlock Text="Prošlo vremena:" FontSize="24" />
+                    <TextBlock FontSize="24" Name="LbElapsedTime" />
                 </ui:SimpleStackPanel>
             </ui:SimpleStackPanel>
         </Border>
     </Grid>
-
 </Window>
