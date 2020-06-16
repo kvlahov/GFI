@@ -1,5 +1,7 @@
 ﻿using GFIManager.Models;
 using GFIManager.Properties;
+using Microsoft.Office.Interop.Excel;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace GFIManager.Services
 {
-    public class GfiBuilderService
+    public class GfiBuilderService : ExcelBaseService
     {
         private readonly IEnumerable<Company> companies;
         private readonly IDictionary<WorkbookType, WorksheetInfo> workbooksInfo;
@@ -114,6 +116,25 @@ namespace GFIManager.Services
                 workbook.Write(outputStream);
                 outputStream.Close();
             }
+
+            RefreshData(newFilePath);
+        }
+
+        private void RefreshData(string newFilePath)
+        {
+            Application app = new Application();
+            var wb = app.Workbooks.Open(newFilePath);
+
+            app.ScreenUpdating = false;
+            app.DisplayAlerts = false;
+            app.EnableEvents = false;
+            app.Interactive = false;
+
+            app.CalculateFull();
+            wb.Close(true);
+
+            app.Quit();
+            ReleaseObject(app);
         }
 
         private void ProcessSingleSheet(string directoryPath, ISheet targetSheet, WorkbookType workbookType)
