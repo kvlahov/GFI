@@ -97,7 +97,7 @@ namespace GFIManager.View.User_controls
 
             await ShowInfoDialog("Izrađujem podatke za bilješke", "Obrada");
             OnBackgroundWorkStart?.Invoke();
-            await Task.Delay(2000);
+
             try
             {
                 var dataToAdd = service.GetDataForNotes(notesToAdd);

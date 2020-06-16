@@ -2,6 +2,6 @@
 {
     public enum WorkbookType
     {
-        Bilanca, RDG, Dodatni, Start
+        Bilanca, RDG, Dodatni, Start, RefStr
     }
 }
