@@ -29,8 +29,8 @@ namespace GFIManager.Services
             var path = Path.Combine(root, Settings.Default.BiljeskeFileName);
             if (!File.Exists(path))
             {
-                //var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "biljeske-template.xls");
-                var templatePath = @"C:\Users\evlakre\source\repos\GFI\GFIManager\Assets\biljeske-template.xls";
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "biljeske-template.xls");
+                //var templatePath = @"C:\Users\evlakre\source\repos\GFI\GFIManager\Assets\biljeske-template.xls";
 
                 using (FileStream inputStream = new FileStream(templatePath, FileMode.Open))
                 {
@@ -121,9 +121,9 @@ namespace GFIManager.Services
 
         private List<string> GetCellValues(ISheet sheet, CellRangeAddress range)
         {
-           return Enumerable.Range(range.FirstColumn, range.LastColumn - range.FirstColumn + 1)
-                                .Select(i => sheet.GetRow(range.FirstRow).GetCell(i).StringCellValue)
-                                .ToList();
+            return Enumerable.Range(range.FirstColumn, range.LastColumn - range.FirstColumn + 1)
+                                 .Select(i => sheet.GetRow(range.FirstRow).GetCell(i).StringCellValue)
+                                 .ToList();
         }
 
 
@@ -206,8 +206,7 @@ namespace GFIManager.Services
 
                 var startingRow = sheet.GetRow(sheet.LastRowNum) == null ? sheet.LastRowNum : sheet.LastRowNum + 1;
                 var companiesArray = notesToAdd.ToArray();
-                
-                //column D, zero based
+
                 var startingColumnIndex = 0;
                 Enumerable.Range(0, notesToAdd.Count())
                     .ToList()
@@ -262,7 +261,7 @@ namespace GFIManager.Services
             for (int i = 0; i < values.Length; i++)
             {
                 var columnIndex = cellsToSet.Dequeue();
-                
+
                 var cell = currentRow.GetCell(columnIndex);
                 var value = values[i];
 
@@ -275,19 +274,28 @@ namespace GFIManager.Services
                 {
                     cell.SetCellValue(value);
                 }
-                
+
                 //set currency style
                 if (columnIndex >= 13)
                 {
-                    var doubleVal = Convert.ToDouble(cell.StringCellValue);
-                    cell.SetCellValue(doubleVal);
+                    try
+                    {
+                        var stringCellValue = cell.StringCellValue;
+                        var doubleVal = string.IsNullOrEmpty(stringCellValue) ? 0 : Convert.ToDouble(stringCellValue);
+                        cell.SetCellValue(doubleVal);
 
-                    var workbook = cell.Sheet.Workbook;
-                    ICellStyle cs = workbook.CreateCellStyle();
-                    cs.DataFormat = workbook.CreateDataFormat().GetFormat("#,##0.00 kn");
-                    
-                    cell.CellStyle = cs;
+                        var workbook = cell.Sheet.Workbook;
+                        ICellStyle cs = workbook.CreateCellStyle();
+                        cs.DataFormat = workbook.CreateDataFormat().GetFormat("#,##0.00 kn");
 
+                        cell.CellStyle = cs;
+                    }
+                    catch (FormatException ex)
+                    {
+                        var msg = $"Expected a number but found \"{cell.StringCellValue}\".\r\n" +
+                            $"Invalid cell is at the address: {cell.Address}, in the bilanca.xls";
+                        throw new FormatException(msg, ex);
+                    }
                 }
             }
 
@@ -297,7 +305,7 @@ namespace GFIManager.Services
             descCell.SetCellType(CellType.Formula);
             descCell.SetCellFormula(string.Format("VLOOKUP(L{0}, Djel!$A$2:$B$616, 2, FALSE)", currentRow.RowNum + 1));
 
-            new HSSFFormulaEvaluator(currentRow.Sheet.Workbook).Evaluate(descCell);
+            new HSSFFormulaEvaluator(currentRow.Sheet.Workbook).EvaluateInCell(descCell);
         }
 
         private string GetCellValueAsString(ICell cell)
