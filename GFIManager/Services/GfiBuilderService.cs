@@ -28,7 +28,7 @@ namespace GFIManager.Services
         {
             return new Dictionary<WorkbookType, string>
             {
-                { WorkbookType.Bilanca, "F7:I135" },
+                { WorkbookType.Bilanca, "F7:I137" },
                 { WorkbookType.RDG, "F7:I74" },
                 { WorkbookType.Dodatni, "F8:I104" },
             };
@@ -43,12 +43,7 @@ namespace GFIManager.Services
                     new WorksheetInfo
                     {
                         FileName = Settings.Default.BilancaFileName,
-                        Range = "G9:J133",
-                        LockedAops = new List<string>
-                        {
-                            "2", "3", "10", "20", "31", "37", "38", "46", "53",
-                            "65", "67", "70", "77", "81", "84", "88", "95", "107", "123"
-                        }
+                        Range = "G9:J135"
                     }
                 },
                 {
@@ -56,13 +51,7 @@ namespace GFIManager.Services
                     new WorksheetInfo
                     {
                         FileName = Settings.Default.RDGFileName,
-                        Range = "G8:J68",
-                        LockedAops = new List<string>
-                        {
-                            "125", "131", "133", "137", "143", "146", "154", "165", "177", "178",
-                            "179", "180", "181", "183", "184", "185", "186", "190", "191", "192",
-                            "193", "194", "195", "196", "197", "198", "199", "203", "213", "214", "215"
-                        }
+                        Range = "G8:J133"
                     }
                 },
                 {
@@ -70,11 +59,7 @@ namespace GFIManager.Services
                     new WorksheetInfo
                     {
                         FileName = Settings.Default.DodatniFileName,
-                        Range = "H9:J88",
-                        LockedAops = new List<string>
-                        {
-                            "278"
-                        }
+                        Range = "H9:J88"
                     }
                 }
             };
@@ -160,13 +145,15 @@ namespace GFIManager.Services
 
                 //set data on target sheet (of final GFI)
                 var targetRange = CellRangeAddress.ValueOf(workbooksInfo[workbookType].Range);
-                for (int i = targetRange.FirstRow; i <= targetRange.LastRow; i++)
+                for (int rowIndex = targetRange.FirstRow; rowIndex <= targetRange.LastRow; rowIndex++)
                 {
-                    if (targetSheet.GetRow(i).GetCell(targetRange.LastColumn).CellStyle.IsLocked) continue;
-                    var aopDouble = targetSheet.GetRow(i).GetCell(targetRange.FirstColumn).NumericCellValue;
+                    if (targetSheet.GetRow(rowIndex).GetCell(targetRange.LastColumn).CellStyle.IsLocked) continue;
+
+                    var aopDouble = targetSheet.GetRow(rowIndex).GetCell(targetRange.FirstColumn).NumericCellValue;
                     var aop = Convert.ToInt32(aopDouble).ToString("D3");
                     var newValue = string.IsNullOrEmpty(sourceValues[aop]) ? 0 : Convert.ToInt32(sourceValues[aop]);
-                    targetSheet.GetRow(i).GetCell(targetRange.LastColumn).SetCellValue(newValue);
+
+                    targetSheet.GetRow(rowIndex).GetCell(targetRange.LastColumn).SetCellValue(newValue);
                 }
             }
 

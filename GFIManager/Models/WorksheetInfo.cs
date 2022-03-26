@@ -6,6 +6,5 @@ namespace GFIManager.Models
     {
         public string Range { get; set; }
         public string FileName { get; set; }
-        public List<string> LockedAops { get; set; }
     }
 }

@@ -57,7 +57,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Client\GFIManager.csproj">
+    <ProjectReference Include="..\GFIManager\GFIManager.csproj">
       <Project>{CC355FA7-216F-4978-B578-CA7467963DAE}</Project>
       <Name>GFIManager</Name>
     </ProjectReference>

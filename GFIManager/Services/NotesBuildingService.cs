@@ -45,7 +45,6 @@ namespace GFIManager.Services
 
         public bool CompanyHasInvalidGfi(Company company)
         {
-            var sw = Stopwatch.StartNew();
             var filePaths = Directory.GetFiles(company.DirectoryPath);
             var gfiFile = filePaths.First(p => p.EndsWith(Settings.Default.FinalGfiSuffix));
 
@@ -58,10 +57,6 @@ namespace GFIManager.Services
             var sheet = workbook.GetSheet("RefStr");
             var cr = new CellReference("A78");
             var res = sheet.GetRow(cr.Row).GetCell(cr.Col).StringCellValue;
-
-            sw.Stop();
-
-            Debug.WriteLine($"CompanyHasInvalidGfiFaster: {sw.ElapsedMilliseconds / 1000f}s");
 
             return !string.IsNullOrEmpty(res);
         }
