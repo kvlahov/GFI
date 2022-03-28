@@ -18,7 +18,7 @@
       <Value Profile="(Default)">-final.xls</Value>
     </Setting>
     <Setting Name="OldGfiSuffix" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">objava 2019.xls</Value>
+      <Value Profile="(Default)">objava \d{4}.xls</Value>
     </Setting>
     <Setting Name="BiljeskeFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">biljeske.xls</Value>

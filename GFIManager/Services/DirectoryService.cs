@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GFIManager.Services
@@ -30,11 +31,12 @@ namespace GFIManager.Services
                 Settings.Default.DodatniFileName
             };
 
-            Predicate<string[]> containsRequiredFiles = (companyFolder) =>
+            var oldGfiSuffixRegex = new Regex(Settings.Default.OldGfiSuffix);
+            Predicate<string[]> containsRequiredFiles = (companyFiles) =>
             {
                 return
-                    companyFolder.Intersect(requiredFiles).Count() == requiredFiles.Count &&
-                    companyFolder.Any(el => el.EndsWith(Settings.Default.OldGfiSuffix));
+                    companyFiles.Intersect(requiredFiles).Count() == requiredFiles.Count &&
+                    companyFiles.Any(el => oldGfiSuffixRegex.IsMatch(el));
             };
 
             return companies

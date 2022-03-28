@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GFIManager.Services
@@ -51,7 +52,7 @@ namespace GFIManager.Services
                     new WorksheetInfo
                     {
                         FileName = Settings.Default.RDGFileName,
-                        Range = "G8:J133"
+                        Range = "G8:J113"
                     }
                 },
                 {
@@ -73,7 +74,8 @@ namespace GFIManager.Services
         private void ProcessSingleCompany(Company company)
         {
             var filePaths = Directory.GetFiles(company.DirectoryPath);
-            var startFile = filePaths.First(p => p.EndsWith(Settings.Default.OldGfiSuffix));
+            var oldGfiSuffixRegex = new Regex(Settings.Default.OldGfiSuffix);
+            var startFile = filePaths.First(p => oldGfiSuffixRegex.IsMatch(p));
 
             var newFileName = Path.GetFileNameWithoutExtension(startFile) + Settings.Default.FinalGfiSuffix;
             var newFilePath = Path.Combine(company.DirectoryPath, newFileName);
@@ -151,7 +153,9 @@ namespace GFIManager.Services
 
                     var aopDouble = targetSheet.GetRow(rowIndex).GetCell(targetRange.FirstColumn).NumericCellValue;
                     var aop = Convert.ToInt32(aopDouble).ToString("D3");
-                    var newValue = string.IsNullOrEmpty(sourceValues[aop]) ? 0 : Convert.ToInt32(sourceValues[aop]);
+
+                    var aopValue = sourceValues.TryGetValue(aop, out string value) ? value : null;
+                    var newValue = string.IsNullOrEmpty(aopValue) ? 0 : Convert.ToInt32(aopValue);
 
                     targetSheet.GetRow(rowIndex).GetCell(targetRange.LastColumn).SetCellValue(newValue);
                 }
