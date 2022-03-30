@@ -16,6 +16,12 @@ namespace GFIManager.Services
     {
         private readonly string root;
         private readonly string notesFilePath;
+        private readonly string opisDjCellAddress = "N4";
+        private readonly CellRangeAddress refRange = CellRangeAddress.ValueOf("D2:L2");
+        private readonly CellRangeAddress bilancaRange = CellRangeAddress.ValueOf("N2:BL2");
+        private readonly CellRangeAddress rdgRange = CellRangeAddress.ValueOf("BM2:CC2");
+        private const int DataStartRow = 6;
+        private const string AktivaCellAddress = "J73";
 
         public NotesBuildingService(string rootDir)
         {
@@ -72,8 +78,7 @@ namespace GFIManager.Services
                 }
 
                 var sheet = workbook.GetSheetAt(0);
-                var dataStartRow = 3;
-                var companyPathsWithNotes = Enumerable.Range(dataStartRow, sheet.LastRowNum + 1 - (dataStartRow - 1))
+                var companyPathsWithNotes = Enumerable.Range(DataStartRow, sheet.LastRowNum + 1 - (DataStartRow - 1))
                     .Where(row => sheet.GetRow(row) != null)
                     .Select(row => sheet.GetRow(row).GetCell(0)?.StringCellValue)
                     .Where(s => !string.IsNullOrWhiteSpace(s));
@@ -92,17 +97,13 @@ namespace GFIManager.Services
 
         private IDictionary<WorkbookType, List<string>> GetSheetsWithTargetCellsFromNotes()
         {
-            var refRange = CellRangeAddress.ValueOf("D2:L2");
-            var bilRange = CellRangeAddress.ValueOf("N2:BL2");
-            var rdgRange = CellRangeAddress.ValueOf("BM2:CC2");
-
             using (FileStream file = new FileStream(notesFilePath, FileMode.Open, FileAccess.Read))
             {
                 var workbook = WorkbookFactory.Create(file);
 
                 var sheet = workbook.GetSheetAt(0);
                 var refValues = GetCellValues(sheet, refRange);
-                var bilValues = GetCellValues(sheet, bilRange);
+                var bilValues = GetCellValues(sheet, bilancaRange);
                 var rdgValues = GetCellValues(sheet, rdgRange);
 
                 return new Dictionary<WorkbookType, List<string>>
@@ -130,7 +131,7 @@ namespace GFIManager.Services
             var refValues = ProccessSingleSheet(sheetTargetCells[WorkbookType.RefStr], filePath, WorkbookType.RefStr);
             var bilancaValues = ProccessSingleSheet(sheetTargetCells[WorkbookType.Bilanca], filePath, WorkbookType.Bilanca);
             var rdgValues = ProccessSingleSheet(sheetTargetCells[WorkbookType.RDG], filePath, WorkbookType.RDG);
-            string aktiva = GetCellValueFromSheet(filePath, WorkbookType.Bilanca, "J73");
+            string aktiva = GetCellValueFromSheet(filePath, WorkbookType.Bilanca, AktivaCellAddress);
 
             return new KeyValuePair<string, List<string>>(company.DirectoryPath, refValues.Concat(bilancaValues).Concat(rdgValues).Append(aktiva).ToList());
         }
@@ -228,7 +229,7 @@ namespace GFIManager.Services
                 var sheet = workbook.GetSheetAt(0);
 
                 var companiesProcessed = 0;
-                for (int i = 3; i <= sheet.LastRowNum; i++)
+                for (int i = DataStartRow; i <= sheet.LastRowNum; i++)
                 {
                     var currentRow = sheet.GetRow(i);
                     var currentCompanyName = currentRow.GetCell(0).StringCellValue;
@@ -250,8 +251,8 @@ namespace GFIManager.Services
 
         private void SetCompanyRow(IRow currentRow, params string[] values)
         {
-            var skipCell = new CellReference("M4");
-            var cellsToSet = new Queue<int>(Enumerable.Range(3, values.Length + 1).Where(i => i != skipCell.Col));
+            var opisDjCell = new CellReference(opisDjCellAddress);
+            var cellsToSet = new Queue<int>(Enumerable.Range(refRange.FirstColumn, values.Length + 1).Where(i => i != opisDjCell.Col));
 
             for (int i = 0; i < values.Length; i++)
             {
@@ -271,7 +272,7 @@ namespace GFIManager.Services
                 }
 
                 //set currency style
-                if (columnIndex >= 13)
+                if (columnIndex >= bilancaRange.FirstColumn)
                 {
                     try
                     {
@@ -295,10 +296,10 @@ namespace GFIManager.Services
             }
 
             //set opis formula
-            var descCell = currentRow.GetCell(skipCell.Col) ?? currentRow.CreateCell(skipCell.Col);
+            var descCell = currentRow.GetCell(opisDjCell.Col) ?? currentRow.CreateCell(opisDjCell.Col);
 
             descCell.SetCellType(CellType.Formula);
-            descCell.SetCellFormula(string.Format("VLOOKUP(L{0}, Djel!$A$2:$B$616, 2, FALSE)", currentRow.RowNum + 1));
+            descCell.SetCellFormula(string.Format("VLOOKUP(M{0}, Djel!$A$2:$B$616, 2, FALSE)", currentRow.RowNum + 1));
 
             new HSSFFormulaEvaluator(currentRow.Sheet.Workbook).EvaluateInCell(descCell);
         }
