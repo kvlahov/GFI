@@ -88,5 +88,14 @@ namespace GFIManager.Properties {
                 return ((string)(this["BiljeskeFileName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("biljeske-template.xls")]
+        public string BiljeskeTemplateFileName {
+            get {
+                return ((string)(this["BiljeskeTemplateFileName"]));
+            }
+        }
     }
 }

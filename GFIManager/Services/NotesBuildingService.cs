@@ -36,7 +36,7 @@ namespace GFIManager.Services
             var path = Path.Combine(root, Settings.Default.BiljeskeFileName);
             if (!File.Exists(path))
             {
-                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "biljeske-template.xls");
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", Settings.Default.BiljeskeTemplateFileName);
                 //var templatePath = @"C:\Users\evlakre\source\repos\GFI\GFIManager\Assets\biljeske-template.xls";
 
                 using (FileStream inputStream = new FileStream(templatePath, FileMode.Open))
