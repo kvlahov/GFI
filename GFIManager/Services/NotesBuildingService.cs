@@ -17,11 +17,12 @@ namespace GFIManager.Services
         private readonly string root;
         private readonly string notesFilePath;
         private readonly string opisDjCellAddress = "N4";
-        private readonly CellRangeAddress refRange = CellRangeAddress.ValueOf("D2:L2");
-        private readonly CellRangeAddress bilancaRange = CellRangeAddress.ValueOf("N2:BL2");
-        private readonly CellRangeAddress rdgRange = CellRangeAddress.ValueOf("BM2:CC2");
+        private readonly CellRangeAddress refRange = CellRangeAddress.ValueOf("E4:M4");
+        private readonly CellRangeAddress bilancaRange = CellRangeAddress.ValueOf("O4:BM4");
+        private readonly CellRangeAddress rdgRange = CellRangeAddress.ValueOf("BN4:CD4");
         private const int DataStartRow = 6;
         private const string AktivaCellAddress = "J73";
+        private const int StartingColumnIndex = 1;
 
         public NotesBuildingService(string rootDir)
         {
@@ -80,7 +81,7 @@ namespace GFIManager.Services
                 var sheet = workbook.GetSheetAt(0);
                 var companyPathsWithNotes = Enumerable.Range(DataStartRow, sheet.LastRowNum + 1 - (DataStartRow - 1))
                     .Where(row => sheet.GetRow(row) != null)
-                    .Select(row => sheet.GetRow(row).GetCell(0)?.StringCellValue)
+                    .Select(row => sheet.GetRow(row).GetCell(StartingColumnIndex)?.StringCellValue)
                     .Where(s => !string.IsNullOrWhiteSpace(s));
 
                 return companyPathsWithNotes;
@@ -203,13 +204,12 @@ namespace GFIManager.Services
                 var startingRow = sheet.GetRow(sheet.LastRowNum) == null ? sheet.LastRowNum : sheet.LastRowNum + 1;
                 var companiesArray = notesToAdd.ToArray();
 
-                var startingColumnIndex = 0;
                 Enumerable.Range(0, notesToAdd.Count())
                     .ToList()
                     .ForEach(i =>
                     {
                         var currentRow = sheet.CreateRow(startingRow + i);
-                        currentRow.CreateCell(startingColumnIndex).SetCellValue(companiesArray.ElementAt(i).Key);
+                        currentRow.CreateCell(StartingColumnIndex).SetCellValue(companiesArray.ElementAt(i).Key);
                         SetCompanyRow(currentRow, companiesArray.ElementAt(i).Value.ToArray());
                     });
 
