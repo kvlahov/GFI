@@ -7,6 +7,7 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:con="clr-namespace:GFIManager.View.User_controls"
+        xmlns:properties="clr-namespace:GFIManager.Properties"
         xmlns:ViewModels="clr-namespace:GFIManager.ViewModels" x:Class="GFIManager.MainWindow"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
@@ -49,63 +50,97 @@
                 <Grid>
                     <Grid Margin="30 30 10 30">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
 
-                        <Grid Margin="0 0 0 10">
+                        <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                            <ListBox x:Name="LbDirectories" Grid.Row="1" SelectionMode="Multiple" ItemsSource="{Binding Companies}" SelectionChanged="LbDirectories_SelectionChanged">
-                                <ListBox.Resources>
-                                    <Style TargetType="{x:Type ListBoxItem}">
-                                        <Setter Property="OverridesDefaultStyle" Value="true" />
-                                        <Setter Property="SnapsToDevicePixels" Value="true" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                    <CheckBox Margin="5,2"
-                                          IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsSelected}">
-                                                        <ContentPresenter Content="{Binding DisplayName}" />
-                                                    </CheckBox>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListBox.Resources>
+                            <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" >
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" Text="Mapa:" Margin="0 0 5 0">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{DynamicResource DarkBlue}" />
+                                    </TextBlock.Foreground></TextBlock>
+                                <TextBlock x:Name="TbChosenFolder" Text="{Binding Source={x:Static properties:Settings.Default}, Path=RootDir}" IsEnabled="False" d:Text="Test layout">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{DynamicResource Dark}" />
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </StackPanel>
 
-                                <ListBox.Style>
-                                    <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
-                                        <Style.Triggers>
-                                            <!-- Use ListBox.HasItems instead of Binding -->
-                                            <Trigger Property="HasItems" Value="False">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" TextWrapping="Wrap">
-                                                                <TextBlock.Foreground>
-                                                                    <SolidColorBrush Color="{DynamicResource DarkBlue}" />
-                                                                </TextBlock.Foreground>GFI-ovi su kreirani za sve firme</TextBlock>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListBox.Style>
+                            <Grid Margin="0,0,0,10" Grid.Row="1" Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
 
-                                <ListBox.Background>
-                                    <SolidColorBrush Color="{DynamicResource LightGrey}" />
-                                </ListBox.Background>
-                            </ListBox>
+                                <ListBox x:Name="LbDirectories" Grid.Row="1" SelectionMode="Multiple" ItemsSource="{Binding Companies}" SelectionChanged="LbDirectories_SelectionChanged">
+                                    <ListBox.Resources>
+                                        <Style TargetType="{x:Type ListBoxItem}">
+                                            <Setter Property="OverridesDefaultStyle" Value="true" />
+                                            <Setter Property="SnapsToDevicePixels" Value="true" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                        <CheckBox Margin="5,2"
+                    IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsSelected}">
+                                                            <ContentPresenter Content="{Binding DisplayName}" />
+                                                        </CheckBox>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.Resources>
+
+                                    <ListBox.Style>
+                                        <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                            <Style.Triggers>
+                                                <!-- Use ListBox.HasItems instead of Binding -->
+                                                <Trigger Property="HasItems" Value="False">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" TextWrapping="Wrap">
+                                                                    <TextBlock.Foreground>
+                                                                        <SolidColorBrush Color="{DynamicResource DarkBlue}" />
+                                                                    </TextBlock.Foreground>GFI-ovi su kreirani za sve firme</TextBlock>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListBox.Style>
+
+                                    <ListBox.Background>
+                                        <SolidColorBrush Color="{DynamicResource LightGrey}" />
+                                    </ListBox.Background>
+                                </ListBox>
+                            </Grid>
+
+                            <Grid Grid.RowSpan="2" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+                                <ui:SimpleStackPanel Spacing="5">
+                                    <Button x:Name="BtnRefreshDirs" Click="BtnRefreshDirs_Click" >Osvježi</Button>
+                                    <Button HorizontalAlignment="Stretch" MaxWidth="66" Background="{x:Null}" Click="BtnDirInfo_Click" Name="BtnDirInfo">
+                                        <fa:ImageAwesome Icon="InfoCircle" Width="30">
+                                            <fa:ImageAwesome.Foreground>
+                                                <SolidColorBrush Color="{DynamicResource DarkBlue}" />
+                                            </fa:ImageAwesome.Foreground>
+                                        </fa:ImageAwesome>
+                                    </Button>
+                                </ui:SimpleStackPanel>
+                            </Grid>
+                            
                         </Grid>
+
 
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
@@ -129,17 +164,6 @@
 
                             <Button x:Name="BtnBuildGfi" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10,0,0" Style="{StaticResource AccentButtonStyle}" Content="Izradi GFI" Click="BtnBuildGfi_Click" IsEnabled="{Binding AreItemsSelected}" />
                         </Grid>
-
-                        <ui:SimpleStackPanel Grid.Column="1" Spacing="5">
-                            <Button x:Name="BtnRefreshDirs" Click="BtnRefreshDirs_Click" >Osvježi</Button>
-                            <Button HorizontalAlignment="Stretch" MaxWidth="66" Background="{x:Null}" Click="BtnDirInfo_Click" Name="BtnDirInfo">
-                                <fa:ImageAwesome Icon="InfoCircle" Width="30">
-                                    <fa:ImageAwesome.Foreground>
-                                        <SolidColorBrush Color="{DynamicResource DarkBlue}" />
-                                    </fa:ImageAwesome.Foreground>
-                                </fa:ImageAwesome>
-                            </Button>
-                        </ui:SimpleStackPanel>
                     </Grid>
                 </Grid>
             </TabItem>
