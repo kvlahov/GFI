@@ -5,6 +5,18 @@
     <Setting Name="RootDir" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="GFIFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">GFI.xls</Value>
+    </Setting>
+    <Setting Name="OPFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">OP.xls</Value>
+    </Setting>
+    <Setting Name="PDFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">PD.xls</Value>
+    </Setting>
+    <Setting Name="NotesFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Bilješke.docx</Value>
+    </Setting>
     <Setting Name="BilancaFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">bil.xls</Value>
     </Setting>
@@ -25,15 +37,6 @@
     </Setting>
     <Setting Name="BiljeskeTemplateFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">biljeske-template.xls</Value>
-    </Setting>
-    <Setting Name="GFIFileName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">GFI.xls</Value>
-    </Setting>
-    <Setting Name="OPFileName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">OP.xls</Value>
-    </Setting>
-    <Setting Name="PDFileName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">PD.xls</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -1,6 +1,6 @@
 ﻿using GFIManager.Models;
 using GFIManager.Properties;
-using GFIManager.Services;
+using GFIManager.Services.Notes;
 using GFIManager.View;
 using GFIManager.View.User_controls;
 using GFIManager.ViewModels;
@@ -41,18 +41,6 @@ namespace GFIManager
             }
 
             LoadCompanies();
-
-            NotesControl.OnBackgroundWorkStart += () =>
-            {
-                ElapsedTimeContainer.Visibility = Visibility.Collapsed;
-                Loader.Visibility = Visibility.Visible;
-            };
-
-            NotesControl.OnBackgroundWorkEnd += () =>
-            {
-                ElapsedTimeContainer.Visibility = Visibility.Visible;
-                Loader.Visibility = Visibility.Hidden;
-            };
         }
 
         private void LoadCompanies()
@@ -62,7 +50,7 @@ namespace GFIManager
             try
             {
                 var service = new DirectoryService(rootDir);
-                var companies = service.GetCompaniesWithoutNewGfi();
+                var companies = service.GetCompaniesWithoutNotes();
                 ViewModel.SetCompanies(companies);
             }
             catch (Exception ex)
@@ -145,44 +133,44 @@ namespace GFIManager
 
         #region Events
 
-        private async void BtnSettings_Click(object sender, RoutedEventArgs e)
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
             ShowChooseFolderDialog();
             LoadCompanies();
-            await NotesControl.RefreshCompaniesAsync();
+            //await NotesControl.RefreshCompaniesAsync();
         }
 
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e) => LbDirectories.SelectAll();
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e) => LbDirectories.UnselectAll();
 
-        private async void BtnBuildGfi_Click(object sender, RoutedEventArgs e)
+        private async void BtnBuildNotes_Click(object sender, RoutedEventArgs e)
         {
             var selectedCompanies = LbDirectories.SelectedItems.Cast<Company>().ToList();
-            var validCompanies = new DirectoryService(Settings.Default.RootDir).GetCompaniesWithoutNewGfi().Intersect(selectedCompanies);
+            var validCompanies = new DirectoryService(Settings.Default.RootDir).GetCompaniesWithoutNotes().Intersect(selectedCompanies);
 
             var skipCompanies = selectedCompanies.Except(validCompanies).Select(c => c.DisplayName);
             if (skipCompanies.Any())
             {
-                var msg = $"Preskačem sljedeće firme jer nedostaje datoteka ili imaju već izrađen GFI: {string.Join(", ", skipCompanies)}";
+                var msg = $"Preskačem sljedeće firme jer nedostaje datoteka ili imaju već izrađene bilješke: {string.Join(", ", skipCompanies)}";
                 await ShowInfoDialog(msg, "Neispravne firme označene");
             }
 
-            var service = new GfiBuilderService(validCompanies);
+            //var service = new GfiBuilderService(validCompanies);
 
             Loader.Visibility = Visibility.Visible;
 
             var sw = Stopwatch.StartNew();
             var dispatcherTimer = PrepareTimer(sw);
             dispatcherTimer.Start();
-            try
-            {
-                await Task.Run(() => service.BuildGfis()).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                HandleException(ex);
-            }
+            //try
+            //{
+            //    await Task.Run(() => service.BuildGfis()).ConfigureAwait(false);
+            //}
+            //catch (Exception ex)
+            //{
+            //    HandleException(ex);
+            //}
 
             sw.Stop();
             dispatcherTimer.Stop();
@@ -196,7 +184,7 @@ namespace GFIManager
                   await ShowInfoDialog(sb.ToString(), "Završeno");
                   LoadCompanies();
 
-                  await NotesControl.RefreshCompaniesAsync();
+                  //await NotesControl.RefreshCompaniesAsync();
               });
         }
 
@@ -243,5 +231,12 @@ namespace GFIManager
         }
 
         #endregion Events
+
+        private void BtnTestNotes_Click(object sender, RoutedEventArgs e)
+        {
+            var service = new WordBuildingService();
+
+            service.TestFilling();
+        }
     }
 }

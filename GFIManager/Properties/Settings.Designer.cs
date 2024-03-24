@@ -37,6 +37,42 @@ namespace GFIManager.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GFI.xls")]
+        public string GFIFileName {
+            get {
+                return ((string)(this["GFIFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OP.xls")]
+        public string OPFileName {
+            get {
+                return ((string)(this["OPFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PD.xls")]
+        public string PDFileName {
+            get {
+                return ((string)(this["PDFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Bilješke.docx")]
+        public string NotesFileName {
+            get {
+                return ((string)(this["NotesFileName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("bil.xls")]
         public string BilancaFileName {
             get {
@@ -95,33 +131,6 @@ namespace GFIManager.Properties {
         public string BiljeskeTemplateFileName {
             get {
                 return ((string)(this["BiljeskeTemplateFileName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("GFI.xls")]
-        public string GFIFileName {
-            get {
-                return ((string)(this["GFIFileName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("OP.xls")]
-        public string OPFileName {
-            get {
-                return ((string)(this["OPFileName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PD.xls")]
-        public string PDFileName {
-            get {
-                return ((string)(this["PDFileName"]));
             }
         }
     }

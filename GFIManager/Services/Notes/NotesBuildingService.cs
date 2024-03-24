@@ -10,15 +10,15 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace GFIManager.Services
+namespace GFIManager.Services.Notes
 {
-    public class GfiBuilderService : OfficeBaseService
+    public class NotesBuildingService : OfficeBaseService
     {
         private readonly IEnumerable<Company> companies;
         private readonly IDictionary<WorkbookType, WorksheetInfo> workbooksInfo;
         private readonly IDictionary<WorkbookType, string> sourceWorksheetsRanges;
 
-        public GfiBuilderService(IEnumerable<Company> companies)
+        public NotesBuildingService(IEnumerable<Company> companies)
         {
             this.companies = companies;
             workbooksInfo = GetWorkbookInfo();

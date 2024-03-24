@@ -2,7 +2,7 @@
 
 namespace GFIManager.Services
 {
-    public class ExcelBaseService
+    public class OfficeBaseService
     {
         public void ReleaseObject(object obj)
         {
